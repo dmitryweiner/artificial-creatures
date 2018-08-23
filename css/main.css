@@ -1,0 +1,26 @@
+html, body {
+    margin: 0;
+    height:100%;
+    width:100%;
+}
+
+#wrapper {
+    min-height:100%;
+    position:relative;
+}
+
+.full-screen {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+}
+
+.pigeon {
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    background-image: url('../images/pigeon1.png');
+    z-index: 0;
+}
