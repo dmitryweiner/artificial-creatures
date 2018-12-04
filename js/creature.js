@@ -45,11 +45,11 @@ Creature.prototype = Object.create(MovingObject.prototype, {
     },
     createDOMElement: {
         value: function() {
-            const element = document.createElement("div");
+            const element = document.createElement('div');
             const gameField = document.getElementById(GAME_FIELD_ID);
-            element.setAttribute("id", this.id);
+            element.setAttribute('id', this.id);
             element.innerHTML = this.sign;
-            element.setAttribute("class", "creature");
+            element.setAttribute('class', 'creature');
             gameField.appendChild(element);
         },
         enumerable: true,

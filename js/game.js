@@ -5,6 +5,7 @@ const Game = (function () {
     let currentState = 0;
     let maxX = 0, maxY = 0;
     let creatures = [];
+    let foodStore = [];
 
     function init(newMaxX, newMaxY) {
         maxX = newMaxX;
@@ -49,10 +50,17 @@ const Game = (function () {
         }
     }
 
+    function addFood(x, y) {
+        const food = new Food(x - Food.prototype.SIZE / 2, y - Food.prototype.SIZE / 2);
+        food.createDOMElement();
+        foodStore.push(food);
+    }
+
     return {
         DELAY: DELAY,
         init: init,
         getCurrentState: function() { return currentState;},
+        addFood: addFood,
         run: run
     }
 })();

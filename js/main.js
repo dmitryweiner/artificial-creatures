@@ -13,4 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
             Game.run();
         }
     }, Game.DELAY);
+
+    gameField.addEventListener('click', function (event) {
+        Game.addFood(event.clientX, event.clientY);
+    })
 });
