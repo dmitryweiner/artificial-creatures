@@ -56,6 +56,21 @@ Creature.prototype = Object.create(MovingObject.prototype, {
         configurable: true,
         writable: true
     },
+    checkIntersect: {
+        value: function(foodStore) {
+            for (let i = 0; i < foodStore.length; i++) {
+                const food = foodStore[i];
+                if ((Math.abs(food.x - this.x) < food.size)
+                    && (Math.abs(food.y - this.y) < food.size)) {
+                    foodStore[i].needDelete = true;
+                    this.ttl += 10000; // TODO: const?
+                }
+            }
+        },
+        enumerable: true,
+        configurable: true,
+        writable: true
+    },
 });
 
 Creature.prototype.constructor = Creature;

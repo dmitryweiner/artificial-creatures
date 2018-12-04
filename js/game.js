@@ -31,8 +31,15 @@ const Game = (function () {
     function handleCreatures() {
         for (let i = 0; i < creatures.length; i++) {
             creatures[i].doTurn(maxX, maxY);
+            creatures[i].checkIntersect(foodStore);
             if (creatures[i].needDelete) {
                 creatures.splice(i, 1);
+            }
+        }
+        for (let i = 0; i < foodStore.length; i++) {
+            if (foodStore[i].needDelete) {
+                foodStore[i].deleteElement();
+                foodStore.splice(i, 1);
             }
         }
     }
