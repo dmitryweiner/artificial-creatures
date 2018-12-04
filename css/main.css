@@ -9,6 +9,10 @@ html, body {
     position:relative;
 }
 
+#gameField {
+    background-color: darkgreen;
+}
+
 .full-screen {
     position:absolute;
     top:0;
