@@ -58,8 +58,8 @@ Creature.prototype = Object.create(MovingObject.prototype, {
         value: function(foodStore) {
             for (let i = 0; i < foodStore.length; i++) {
                 const food = foodStore[i];
-                if ((Math.abs(food.x - this.x) < (food.size + this.size))
-                    && (Math.abs(food.y - this.y) < (food.size + this.size))) {
+                if ((Math.abs(food.x - this.x) < (food.size + this.size) / 2)
+                    && (Math.abs(food.y - this.y) < (food.size + this.size) / 2)) {
                     foodStore[i].needDelete = true;
                     this.ttl += 10000; // TODO: const?
                 }
