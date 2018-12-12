@@ -26,6 +26,10 @@ html, body {
     height: 20px;
     width: 20px;
     z-index: 0;
+    user-select: none;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;
 }
 
 .food {
@@ -33,4 +37,10 @@ html, body {
     height: 20px;
     width: 20px;
     z-index: 0;
+    user-select: none;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;
 }
+
+

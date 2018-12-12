@@ -3,7 +3,6 @@
 function MovingObject(x, y) {
     SimpleObject.call(this, x, y);
     this.direction = 0;
-    this.mass = 1;
     this.size = MovingObject.prototype.SIZE; // get from image
 }
 

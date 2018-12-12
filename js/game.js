@@ -33,6 +33,7 @@ const Game = (function () {
             creatures[i].doTurn(maxX, maxY);
             creatures[i].checkIntersect(foodStore);
             if (creatures[i].needDelete) {
+                creatures[i].deleteElement();
                 creatures.splice(i, 1);
             }
         }
