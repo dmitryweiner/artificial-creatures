@@ -43,4 +43,16 @@ html, body {
     -ms-user-select: none;
 }
 
+#settings {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: wheat;
+}
+
+.hidden {
+    display: none;
+}
 

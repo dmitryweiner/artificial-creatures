@@ -1,26 +1,44 @@
 'use strict';
 
+const STOP_STATE = 0;
+const RUN_STATE = 1;
+
 const Game = (function () {
-    let score;
-    let currentState = 0;
+    let currentState = STOP_STATE;
     let maxX = 0, maxY = 0;
     let creatures = [];
     let foodStore = [];
+    const neat = new neataptic.Neat(
+        SECTORS_OF_VISION, // inputs: 16 sectors around
+        4, // outputs: 4 directions
+        null, // ranking function
+        {
+            popsize: POPULATION_SIZE,
+            elitism: ELITISM,
+            mutationRate: MUTATION_RATE,
+            mutationAmount: MUTATION_AMOUNT,
+        }
+    );
+    neataptic.Config.warnings = false;
+    neat.mutate();
+    for (let i = 0; i < neat.popsize; i++) {
+        neat.population[i].score = 0;
+    }
 
     function init(newMaxX, newMaxY) {
         maxX = newMaxX;
         maxY = newMaxY;
-        score = 0;
-        creatures = createCreatures();
-        currentState = 1;
+        creatures = createCreatures(neat.population);
+        currentState = RUN_STATE;
     }
 
-    function createCreatures() {
+    function createCreatures(brains) {
         let result = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < POPULATION_SIZE; i++) {
             const creature = new Creature(
                 (maxX - Creature.prototype.SIZE) * Math.random(),
-                (maxY - Creature.prototype.SIZE) * Math.random()
+                (maxY - Creature.prototype.SIZE) * Math.random(),
+                brains[i]
             );
             creature.createDOMElement();
             result.push(creature);
@@ -30,7 +48,7 @@ const Game = (function () {
 
     function handleCreatures() {
         for (let i = 0; i < creatures.length; i++) {
-            creatures[i].doTurn(maxX, maxY);
+            creatures[i].doTurn(maxX, maxY, foodStore);
             creatures[i].checkIntersect(foodStore);
             if (creatures[i].needDelete) {
                 creatures[i].deleteElement();
@@ -45,6 +63,44 @@ const Game = (function () {
         }
     }
 
+    function removeAll() {
+        for (let i = 0; i < creatures.length; i++) {
+            creatures[i].deleteElement();
+        }
+        creatures = [];
+        for (let i = 0; i < foodStore.length; i++) {
+            foodStore[i].deleteElement();
+        }
+        foodStore = [];
+    }
+
+    function mutate() {
+        neat.sort();
+
+        console.log({
+            generation: neat.generation,
+            max: neat.getFittest().score,
+            avg: Math.round(neat.getAverage()),
+            min: neat.population[neat.popsize - 1].score
+        });
+
+        const newGeneration = [];
+        for (let i = 0; i < neat.elitism; i++) {
+            newGeneration.push(neat.population[i]);
+        }
+        for (let i = 0; i < neat.popsize - neat.elitism; i++) {
+            const offspring = neat.getOffspring();
+            offspring.score = 0;
+            newGeneration.push(offspring);
+        }
+        neat.population = newGeneration;
+        neat.mutate();
+
+        neat.generation++;
+        removeAll();
+        creatures = createCreatures(neat.population);
+    }
+
     function checkIfGameOver() {
         return false;
     }
@@ -53,7 +109,7 @@ const Game = (function () {
         if (currentState == 1) {
             handleCreatures();
             if (checkIfGameOver()) {
-                currentState = 2;
+                currentState = Game.STOP_STATE;
             }
         }
     }
@@ -66,9 +122,13 @@ const Game = (function () {
 
     return {
         DELAY: DELAY,
+        FOOD_DELAY: FOOD_DELAY,
+        STOP_STATE: STOP_STATE,
+        RUN_STATE: RUN_STATE,
         init: init,
-        getCurrentState: function() { return currentState;},
+        getCurrentState: function() { return currentState; },
         addFood: addFood,
-        run: run
+        run: run,
+        mutate: mutate,
     }
 })();
