@@ -1,2 +1,3 @@
-# feed-the-pigeon
-Stupid casual game: you should feed pigeons before they die. But wait! These pigeons are AI (NEAT) controlled! Such wow
+# Artificial creatures
+Artificial evolution of neural networks (NEAT).
+Neataptic.js used https://wagenaartje.github.io/neataptic/docs/
