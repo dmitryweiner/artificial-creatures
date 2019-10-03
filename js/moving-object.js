@@ -3,28 +3,19 @@
 function MovingObject(x, y) {
     SimpleObject.call(this, x, y);
     this.direction = 0;
+    this.speed = 0;
     this.size = MovingObject.prototype.SIZE; // get from image
 }
 
 MovingObject.prototype = Object.create(SimpleObject.prototype, {
     doTurn: {
         value: function(maxX, maxY) {
-            switch(this.direction) {
-                case 1:
-                    this.y -= this.step;
-                    break;
-                case 2:
-                    this.x += this.step;
-                    break;
-                case 3:
-                    this.y += this.step;
-                    break;
-                case 4:
-                    this.x -= this.step;
-                    break;
-                default:
-                    break;
-            }
+
+            this.vx = this.speed * Math.cos(this.direction) * this.step;
+            this.vy = this.speed * Math.sin(this.direction) * this.step;
+
+            this.x += this.vx;
+            this.y += this.vy;
 
             //check borders
             if (this.x < 0) {
@@ -50,11 +41,9 @@ MovingObject.prototype = Object.create(SimpleObject.prototype, {
     redraw: {
         value: function() {
             const element = document.getElementById(this.id);
-            const angle = (this.direction - 1) * 90;
-
             element.style.left = this.x + 'px';
             element.style.top = this.y + 'px';
-            element.style.transform =  'rotate(' + angle + 'deg)';
+            element.style.transform =  'rotate(' + (this.direction + Math.PI) + 'rad)';
         },
         enumerable: true,
         configurable: true,

@@ -9,8 +9,8 @@ const Game = (function () {
     let creatures = [];
     let foodStore = [];
     const neat = new neataptic.Neat(
-        SECTORS_OF_VISION, // inputs: 16 sectors around
-        4, // outputs: 4 directions
+        SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+        2, // outputs: angle and speed
         null, // ranking function
         {
             popsize: POPULATION_SIZE,
@@ -20,7 +20,6 @@ const Game = (function () {
         }
     );
     neataptic.Config.warnings = false;
-    neat.mutate();
     for (let i = 0; i < neat.popsize; i++) {
         neat.population[i].score = 0;
     }
@@ -28,6 +27,10 @@ const Game = (function () {
     function init(newMaxX, newMaxY) {
         maxX = newMaxX;
         maxY = newMaxY;
+    }
+
+    function start() {
+        removeAll();
         creatures = createCreatures(neat.population);
         currentState = RUN_STATE;
     }
@@ -102,11 +105,11 @@ const Game = (function () {
     }
 
     function checkIfGameOver() {
-        return false;
+        return creatures.length === 0; // everybody died
     }
 
     function run() {
-        if (currentState == 1) {
+        if (currentState == RUN_STATE) {
             handleCreatures();
             if (checkIfGameOver()) {
                 currentState = Game.STOP_STATE;
@@ -126,6 +129,7 @@ const Game = (function () {
         STOP_STATE: STOP_STATE,
         RUN_STATE: RUN_STATE,
         init: init,
+        start: start,
         getCurrentState: function() { return currentState; },
         addFood: addFood,
         run: run,

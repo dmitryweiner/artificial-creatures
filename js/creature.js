@@ -24,31 +24,40 @@ Creature.prototype = Object.create(MovingObject.prototype, {
             this.ttl -= DELAY;
 
             //steps
-            const distanceToFoodBefore = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
-            const minDistanceBefore = Math.min(...distanceToFoodBefore.filter((e) => e > 0));
-            const activationResult = this.brain.activate(distanceToFoodBefore);
-            let maxActivationResultItem = 0;
-            for (let i = 0; i < 4; i++) {
-                if (activationResult[i] > maxActivationResultItem) {
-                    maxActivationResultItem = activationResult[i];
-                    this.direction = i + 1;
-                }
-            }
+            let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
+            const edgeDetectionResults = edgeDetection(this.x, this.y, maxX, maxY, EDGE_DETECTION_DISTANCE);
+            const activationResult = this.brain.activate([...distanceToFoodBefore, ...edgeDetectionResults]);
+
+            this.direction = activationResult[0] > 1 ? 1 : activationResult[0] < 0 ? 0 : activationResult[0];
+            this.direction = this.direction * 2 * Math.PI;
+            this.speed = activationResult[1] > 1 ? 1 : activationResult[1] < 0 ? 0 : activationResult[1];
 
             MovingObject.prototype.doTurn.apply(this, arguments); // call super
 
-            const distanceToFoodAfter = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
-            const minDistanceAfter = Math.min(...distanceToFoodAfter.filter((e) => e > 0));
+            // moving to food reward
+            let distanceToFoodAfter = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
+            distanceToFoodAfter = distanceToFoodAfter.filter((e) => e > 0); // delete zeroes
+            distanceToFoodBefore = distanceToFoodBefore.filter((e) => e > 0); // delete zeroes
+            if (distanceToFoodBefore.length > 0 && distanceToFoodAfter.length > 0) {
+                const minDistanceAfter = Math.min(...distanceToFoodAfter);
+                const minDistanceBefore = Math.min(...distanceToFoodBefore);
+                if (minDistanceAfter < minDistanceBefore) {
+                    this.brain.score += CLOSE_TO_FOOD_SCORE;
+                } else if(minDistanceAfter > minDistanceBefore) {
+                    this.brain.score -= CLOSE_TO_FOOD_SCORE;
+                }
+            }
 
-            if (minDistanceAfter < minDistanceBefore) {
-                this.brain.score += CLOSER_TO_FOOD_SCORE;
-            } else {
-                this.brain.score -= CLOSER_TO_FOOD_SCORE;
+            // punish close to edge moving
+            const edgeKillingResults = edgeDetection(this.x, this.y, maxX, maxY, EDGE_KILLING_DISTANCE);
+            if (edgeKillingResults.some((e) => e === 1)) {
+                this.needDelete = true;
+                this.brain.score -= CLOSE_TO_EDGE_SCORE;
             }
 
             if (this.ttl < 0) {
                 this.needDelete = true;
-                this.brain.score -= DEATH_SCORE;
+                this.brain.score -= DEATH_SCORE; // punish death
             }
 
             if (!this.needDelete) {
@@ -112,11 +121,13 @@ Creature.prototype.constructor = Creature;
  * @returns {number}
  */
 function convertTtlToSize(ttl) {
-    return Creature.prototype.SIZE * (ttl / MAX_TTL);
+    const result = Creature.prototype.SIZE * (ttl / MAX_TTL);
+    return result < 10 ? 10 : result;
 }
 
 function convertTtlToFontSize(ttl) {
-    return 18 * (ttl / MAX_TTL);
+    const result =  18 * (ttl / MAX_TTL);
+    return result < 10 ? 10 : result;
 }
 
 /**
@@ -153,11 +164,53 @@ function getVisibleFood(x, y, food, seekingDistance) {
         }
     }
 
-    const maxDistance = Math.max(...result);
-    // normalize
-    return result.map((e) => maxDistance > 0 ? e / maxDistance : e);
+    return normalize(result);
 }
 
+/**
+ *
+ * @param x
+ * @param y
+ * @param maxX
+ * @param maxY
+ * @returns {number[]}
+ */
+function edgeDetection(x, y, maxX, maxY, distance) {
+    let result = [0, 0, 0, 0];
+
+    if (x < distance) {
+        result[3] = 1;
+    }
+    if (Math.abs(x - maxX) < distance) {
+        result[1] = 1;
+    }
+    if (y < distance) {
+        result[0] = 1;
+    }
+    if (Math.abs(y - maxY) < distance) {
+        result[2] = 1;
+    }
+
+    return result;
+}
+
+/**
+ * Normalize vector
+ *
+ * {array} v
+ * @returns {array}
+ */
+function normalize(v) {
+    if (!Array.isArray(v) || v.length === 0) {
+        throw new Error('Wrong parameter');
+    }
+    let result = v;
+    const max = Math.max(...result);
+    if (max !== 0) {
+        result = result.map((e) => e / max);
+    }
+    return result;
+}
 
 /** Get the angle from one point to another */
 function angleToPoint(x1, y1, x2, y2){
