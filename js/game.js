@@ -3,44 +3,47 @@
 const STOP_STATE = 0;
 const RUN_STATE = 1;
 
-const Game = (function () {
-    let currentState = STOP_STATE;
-    let maxX = 0, maxY = 0;
-    let creatures = [];
-    let foodStore = [];
-    const neat = new neataptic.Neat(
-        SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
-        2, // outputs: angle and speed
-        null, // ranking function
-        {
-            popsize: POPULATION_SIZE,
-            elitism: ELITISM,
-            mutationRate: MUTATION_RATE,
-            mutationAmount: MUTATION_AMOUNT,
+class Game {
+
+    constructor(gameField, popSize) {
+        this.gameField = gameField;
+        this.popSize = popSize;
+        this.currentState = STOP_STATE;
+        this.maxX = this.gameField.clientWidth;
+        this.maxY = this.gameField.clientHeight;
+
+        this.creatures = [];
+        this.foodStore = [];
+        this.neat = new neataptic.Neat(
+            SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+            2, // output channels: angle and speed
+            null, // ranking function
+            {
+                popsize: POPULATION_SIZE,
+                elitism: ELITISM,
+                mutationRate: MUTATION_RATE,
+                mutationAmount: MUTATION_AMOUNT,
+            }
+        );
+        neataptic.Config.warnings = false;
+        for (let i = 0; i < this.neat.popsize; i++) {
+            this.neat.population[i].score = 0;
         }
-    );
-    neataptic.Config.warnings = false;
-    for (let i = 0; i < neat.popsize; i++) {
-        neat.population[i].score = 0;
     }
 
-    function init(newMaxX, newMaxY) {
-        maxX = newMaxX;
-        maxY = newMaxY;
+    start() {
+        this.removeAll();
+        this.creatures = this.createCreatures(this.neat.population);
+        this.currentState = RUN_STATE;
     }
 
-    function start() {
-        removeAll();
-        creatures = createCreatures(neat.population);
-        currentState = RUN_STATE;
-    }
-
-    function createCreatures(brains) {
+    createCreatures(brains) {
         let result = [];
-        for (let i = 0; i < POPULATION_SIZE; i++) {
+        for (let i = 0; i < this.popSize; i++) {
             const creature = new Creature(
-                (maxX - Creature.prototype.SIZE) * Math.random(),
-                (maxY - Creature.prototype.SIZE) * Math.random(),
+                (this.maxX - Creature.SIZE) * Math.random(),
+                (this.maxY - Creature.SIZE) * Math.random(),
+                this.gameField,
                 brains[i]
             );
             creature.createDOMElement();
@@ -49,90 +52,77 @@ const Game = (function () {
         return result;
     }
 
-    function handleCreatures() {
-        for (let i = 0; i < creatures.length; i++) {
-            creatures[i].doTurn(maxX, maxY, foodStore);
-            creatures[i].checkIntersect(foodStore);
-            if (creatures[i].needDelete) {
-                creatures[i].deleteElement();
-                creatures.splice(i, 1);
+    handleCreatures() {
+        for (let i = 0; i < this.creatures.length; i++) {
+            this.creatures[i].doTurn(this.maxX, this.maxY, this.foodStore);
+            this.creatures[i].checkIntersect(this.foodStore);
+            if (this.creatures[i].needDelete) {
+                this.creatures[i].deleteDOMElement();
+                this.creatures.splice(i, 1);
             }
         }
-        for (let i = 0; i < foodStore.length; i++) {
-            if (foodStore[i].needDelete) {
-                foodStore[i].deleteElement();
-                foodStore.splice(i, 1);
+        for (let i = 0; i < this.foodStore.length; i++) {
+            if (this.foodStore[i].needDelete) {
+                this.foodStore[i].deleteDOMElement();
+                this.foodStore.splice(i, 1);
             }
         }
     }
 
-    function removeAll() {
-        for (let i = 0; i < creatures.length; i++) {
-            creatures[i].deleteElement();
+    removeAll() {
+        for (let i = 0; i < this.creatures.length; i++) {
+            this.creatures[i].deleteDOMElement();
         }
-        creatures = [];
-        for (let i = 0; i < foodStore.length; i++) {
-            foodStore[i].deleteElement();
+        this.creatures = [];
+        for (let i = 0; i < this.foodStore.length; i++) {
+            this.foodStore[i].deleteDOMElement();
         }
-        foodStore = [];
+        this.foodStore = [];
     }
 
-    function mutate() {
-        neat.sort();
+    mutate() {
+        this.neat.sort();
 
         console.log({
-            generation: neat.generation,
-            max: neat.getFittest().score,
-            avg: Math.round(neat.getAverage()),
-            min: neat.population[neat.popsize - 1].score
+            generation: this.neat.generation,
+            max: this.neat.getFittest().score,
+            avg: Math.round(this.neat.getAverage()),
+            min: this.neat.population[this.neat.popsize - 1].score
         });
 
         const newGeneration = [];
-        for (let i = 0; i < neat.elitism; i++) {
-            newGeneration.push(neat.population[i]);
+        for (let i = 0; i < this.neat.elitism; i++) {
+            newGeneration.push(this.neat.population[i]);
         }
-        for (let i = 0; i < neat.popsize - neat.elitism; i++) {
-            const offspring = neat.getOffspring();
+        for (let i = 0; i < this.neat.popsize - this.neat.elitism; i++) {
+            const offspring = this.neat.getOffspring();
             offspring.score = 0;
             newGeneration.push(offspring);
         }
-        neat.population = newGeneration;
-        neat.mutate();
+        this.neat.population = newGeneration;
+        this.neat.mutate();
 
-        neat.generation++;
-        removeAll();
-        creatures = createCreatures(neat.population);
+        this.neat.generation++;
+        this.removeAll();
+        this.creatures = this.createCreatures(this.neat.population);
     }
 
-    function checkIfGameOver() {
-        return creatures.length === 0; // everybody died
+    checkIfGameOver() {
+        return this.creatures.length === 0; // everybody died
     }
 
-    function run() {
-        if (currentState == RUN_STATE) {
-            handleCreatures();
-            if (checkIfGameOver()) {
-                currentState = Game.STOP_STATE;
+    run() {
+        if (this.currentState === RUN_STATE) {
+            this.handleCreatures();
+            if (this.checkIfGameOver()) {
+                this.currentState = STOP_STATE;
             }
         }
     }
 
-    function addFood(x, y) {
-        const food = new Food(x - Food.prototype.SIZE / 2, y - Food.prototype.SIZE / 2);
+    addFood(x, y) {
+        const food = new Food(x - Food.SIZE / 2, y - Food.SIZE / 2, this.gameField);
         food.createDOMElement();
-        foodStore.push(food);
+        this.foodStore.push(food);
     }
-
-    return {
-        DELAY: DELAY,
-        FOOD_DELAY: FOOD_DELAY,
-        STOP_STATE: STOP_STATE,
-        RUN_STATE: RUN_STATE,
-        init: init,
-        start: start,
-        getCurrentState: function() { return currentState; },
-        addFood: addFood,
-        run: run,
-        mutate: mutate,
-    }
-})();
+}

@@ -1,23 +1,26 @@
 'use strict';
 
-function SimpleObject(x, y) {
-    this.id = generateId();
-    this.x = x;
-    this.y = y;
-    this.size = SimpleObject.prototype.SIZE;
-    this.needDelete = false;
-}
+class SimpleObject {
 
-SimpleObject.prototype = {
-    SIZE: 10,
-    createDOMElement: function() {
+    static SIZE = 10;
+
+    constructor(x, y, gameField) {
+        this.id = generateId();
+        this.gameField = gameField;
+        this.x = x;
+        this.y = y;
+        this.size = SimpleObject.SIZE;
+        this.needDelete = false;
+    }
+
+    createDOMElement() {
         const element = document.createElement('div');
-        const gameField = document.getElementById(GAME_FIELD_ID);
         element.setAttribute('id', this.id);
-        gameField.appendChild(element);
-    },
-    deleteElement: function() {
+        this.gameField.appendChild(element);
+    }
+
+    deleteDOMElement() {
         const element = document.getElementById(this.id);
         element.parentNode.removeChild(element);
-    },
-};
+    }
+}

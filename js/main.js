@@ -3,36 +3,32 @@
 document.addEventListener('DOMContentLoaded', function () {
     let isSettingsPanelOpened = false;
     const gameField = document.getElementById(GAME_FIELD_ID);
-
-    Game.init(
-        gameField.clientWidth,
-        gameField.clientHeight
-    );
-    Game.start();
+    const game = new Game(gameField, POPULATION_SIZE);
+    game.start();
 
     window.setInterval(() => {
-        if (Game.getCurrentState() == Game.RUN_STATE) {
-            Game.run();
+        if (game.currentState === RUN_STATE) {
+            game.run();
         }
-    }, Game.DELAY);
+    }, DELAY);
 
     gameField.addEventListener('click', (event) => {
-        Game.addFood(event.clientX, event.clientY);
+        game.addFood(event.clientX, event.clientY);
     });
 
     window.setInterval(() => {
-        if (Game.getCurrentState() == Game.RUN_STATE) {
-            Game.addFood((gameField.clientWidth - Food.prototype.SIZE) * Math.random(),
-            (gameField.clientHeight - Food.prototype.SIZE) * Math.random()
+        if (game.currentState === RUN_STATE) {
+            game.addFood((gameField.clientWidth - Food.SIZE) * Math.random(),
+            (gameField.clientHeight - Food.SIZE) * Math.random()
             );
         } else {
-            Game.mutate(); // next generation
-            Game.start();
+            game.mutate(); // next generation
+            game.start();
         }
-    }, Game.FOOD_DELAY);
+    }, FOOD_DELAY);
 
     document.getElementById('mutateButton').addEventListener('click', () => {
-       Game.mutate();
-       Game.start();
+       game.mutate();
+       game.start();
     });
 });
