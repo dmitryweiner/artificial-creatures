@@ -3,7 +3,9 @@ html, body {
     height:100%;
     width:100%;
     overflow-x: hidden;
+    /*
     overflow-y: hidden;
+    */
 }
 
 #wrapper {
@@ -13,6 +15,7 @@ html, body {
 
 #gameField {
     background-color: darkgreen;
+    position: relative;
 }
 
 .full-screen {
@@ -46,15 +49,38 @@ html, body {
 }
 
 #settings {
+    font-family: Verdana;
+    min-width: 150px;
     position: absolute;
     top: 0;
     right: 0;
-    padding: 5px;
+    padding: 10px;
     border-radius: 5px;
     background-color: wheat;
 }
 
 .hidden {
     display: none;
+}
+
+#trainingGameFieldsHolder {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: sandybrown;
+    overflow-y: scroll;
+    padding-bottom: 20px;
+    padding-right: 20px;
+}
+
+.training-game-field {
+    position: relative;
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 200px;
+    max-height: 200px;
+    margin-top: 20px;
+    margin-left: 20px;
+    background-color: darkgreen;
 }
 

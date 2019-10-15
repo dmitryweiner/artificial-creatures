@@ -3,6 +3,9 @@
 const SIZE = 20;
 
 class Creature extends MovingObject {
+
+    static SIZE = 20;
+
     constructor(x, y, gameField, brain) {
         super(x, y, gameField);
         this.ttl = MAX_TTL - Math.random() * MAX_TTL / 2;
@@ -17,10 +20,11 @@ class Creature extends MovingObject {
 
         //life pass
         this.ttl -= DELAY;
+        this.size = convertTtlToSize(this.ttl);
 
         //steps
         let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
-        const edgeDetectionResults = edgeDetection(this.x, this.y, maxX, maxY, EDGE_DETECTION_DISTANCE);
+        const edgeDetectionResults = this.edgeDetection(EDGE_DETECTION_DISTANCE);
         const activationResult = this.brain.activate([...distanceToFoodBefore, ...edgeDetectionResults]);
 
         this.direction = activationResult[0] > 1 ? 1 : activationResult[0] < 0 ? 0 : activationResult[0];
@@ -44,7 +48,7 @@ class Creature extends MovingObject {
         }
 
         // punish close to edge moving
-        const edgeKillingResults = edgeDetection(this.x, this.y, maxX, maxY, EDGE_KILLING_DISTANCE);
+        const edgeKillingResults = this.edgeDetection(EDGE_KILLING_DISTANCE);
         if (edgeKillingResults.some((e) => e === 1)) {
             this.needDelete = true;
             this.brain.score -= CLOSE_TO_EDGE_SCORE;
@@ -65,19 +69,44 @@ class Creature extends MovingObject {
         element.setAttribute('id', this.id);
         element.innerHTML = this.sign;
         element.setAttribute('class', 'creature');
+        element.style.left = this.x + 'px';
+        element.style.top = this.y + 'px';
         this.gameField.appendChild(element);
     }
 
     checkIntersect(foodStore) {
         for (let i = 0; i < foodStore.length; i++) {
             const food = foodStore[i];
-            if ((Math.abs(food.x - this.x) < (food.size + this.size) / 2)
-                && (Math.abs(food.y - this.y) < (food.size + this.size) / 2)) {
+            if (distance(food.x, food.y, this.x, this.y) < (Food.SIZE + this.size) / 2) {
                 foodStore[i].needDelete = true;
                 this.ttl += 10000; // TODO: const?
                 this.brain.score += FOUND_FOOD_SCORE;
             }
         }
+    }
+
+    /**
+     *
+     * @param {number} distance
+     * @returns {number[]}
+     */
+    edgeDetection(distance) {
+        let result = [0, 0, 0, 0];
+
+        if (this.x <= distance) {
+            result[3] = 1;
+        }
+        if (Math.abs(this.x - (this.maxX - this.size)) <= distance) {
+            result[1] = 1;
+        }
+        if (this.y <= distance) {
+            result[0] = 1;
+        }
+        if (Math.abs(this.y - (this.maxY - this.size)) <= distance) {
+            result[2] = 1;
+        }
+
+        return result;
     }
 
     redraw() {
@@ -97,7 +126,7 @@ class Creature extends MovingObject {
  * @returns {number}
  */
 function convertTtlToSize(ttl) {
-    const result = Creature.prototype.SIZE * (ttl / MAX_TTL);
+    const result = Creature.SIZE * (ttl / MAX_TTL);
     return result < 10 ? 10 : result;
 }
 
@@ -141,68 +170,4 @@ function getVisibleFood(x, y, food, seekingDistance) {
     }
 
     return normalize(result);
-}
-
-/**
- *
- * @param x
- * @param y
- * @param maxX
- * @param maxY
- * @returns {number[]}
- */
-function edgeDetection(x, y, maxX, maxY, distance) {
-    let result = [0, 0, 0, 0];
-
-    if (x < distance) {
-        result[3] = 1;
-    }
-    if (Math.abs(x - maxX) < distance) {
-        result[1] = 1;
-    }
-    if (y < distance) {
-        result[0] = 1;
-    }
-    if (Math.abs(y - maxY) < distance) {
-        result[2] = 1;
-    }
-
-    return result;
-}
-
-/**
- * Normalize vector
- *
- * {array} v
- * @returns {array}
- */
-function normalize(v) {
-    if (!Array.isArray(v) || v.length === 0) {
-        throw new Error('Wrong parameter');
-    }
-    let result = v;
-    const max = Math.max(...result);
-    if (max !== 0) {
-        result = result.map((e) => e / max);
-    }
-    return result;
-}
-
-/** Get the angle from one point to another */
-function angleToPoint(x1, y1, x2, y2) {
-    const d = distance(x1, y1, x2, y2);
-    const dx = (x2 - x1) / d;
-    const dy = (y2 - y1) / d;
-
-    let a = Math.acos(dx);
-    a = dy < 0 ? 2 * Math.PI - a : a;
-    return a;
-}
-
-/** Calculate distance between two points */
-function distance(x1, y1, x2, y2) {
-    const dx = x1 - x2;
-    const dy = y1 - y2;
-
-    return Math.sqrt(dx * dx + dy * dy);
 }

@@ -17,14 +17,28 @@
 </head>
 <body>
 <div id="wrapper">
-  <div id="gameField" class="full-screen">
+  <div id="gameField" class="full-screen" style="display: none">
+  </div>
+  <div id="trainingGameFieldsHolder">
+
   </div>
 </div>
 <div id="settings">
-  <input id="mutateButton" type="button" value="mutate" />
-  <input id="toggleButton" type="button" value="[+]" />
-  <div class="inner-settings hidden">
-    Population: <span id="population">50</span><br/>
+  <div class="mode">
+    <div>
+      <input type="radio" id="trainingSelector" name="mode" value="training" checked>
+      <label for="trainingSelector">Training</label>
+    </div>
+    <div>
+      <input type="radio" id="liveSelector" name="mode" value="live">
+      <label for="liveSelector">Live</label>
+    </div>
+  </div>
+  <div class="settings">
+    Alive: <span id="alive"></span><br/>
+    Min: <span id="min"></span><br/>
+    Avg: <span id="avg"></span><br/>
+    Max: <span id="max"></span><br/>
   </div>
 </div>
 </body>

@@ -1,17 +1,17 @@
 'use strict';
 
 const GAME_FIELD_ID = 'gameField';
-const DELAY = 40;
-const FOOD_DELAY = 500;
+const DELAY = 50;
+const FOOD_DELAY = 2000;
 const MAX_TTL = 50000;
-const POPULATION_SIZE = 50;
+const POPULATION_SIZE = 10;
 const ELITISM = 5;
 const MUTATION_RATE = 0.3;
 const MUTATION_AMOUNT = 3;
 const MAX_SEEKING_DISTANCE = 300;
 const SECTORS_OF_VISION = 16;
 const EDGE_DETECTION_DISTANCE = 40;
-const EDGE_KILLING_DISTANCE = 20;
+const EDGE_KILLING_DISTANCE = 0;
 
 const FOUND_FOOD_SCORE = 10;
 const CLOSE_TO_FOOD_SCORE = 1;

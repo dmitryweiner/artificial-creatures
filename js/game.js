@@ -5,7 +5,7 @@ const RUN_STATE = 1;
 
 class Game {
 
-    constructor(gameField, popSize) {
+    constructor(gameField, popSize, population) {
         this.gameField = gameField;
         this.popSize = popSize;
         this.currentState = STOP_STATE;
@@ -19,13 +19,16 @@ class Game {
             2, // output channels: angle and speed
             null, // ranking function
             {
-                popsize: POPULATION_SIZE,
+                popsize: popSize,
                 elitism: ELITISM,
                 mutationRate: MUTATION_RATE,
                 mutationAmount: MUTATION_AMOUNT,
             }
         );
         neataptic.Config.warnings = false;
+        if (population) {
+            this.neat.population = population;
+        }
         for (let i = 0; i < this.neat.popsize; i++) {
             this.neat.population[i].score = 0;
         }
@@ -121,7 +124,16 @@ class Game {
     }
 
     addFood(x, y) {
-        const food = new Food(x - Food.SIZE / 2, y - Food.SIZE / 2, this.gameField);
+        let foodX, foodY;
+        if (x && y) {
+            foodX = x;
+            foodY = y;
+        } else {
+            foodX = (this.maxX - Food.SIZE) * Math.random();
+            foodY = (this.maxY - Food.SIZE) * Math.random();
+        }
+
+        const food = new Food(foodX, foodY, this.gameField);
         food.createDOMElement();
         this.foodStore.push(food);
     }
