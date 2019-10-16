@@ -50,7 +50,7 @@ html, body {
 
 #settings {
     font-family: Verdana;
-    min-width: 150px;
+    min-width: 250px;
     position: absolute;
     top: 0;
     right: 0;
@@ -82,5 +82,18 @@ html, body {
     margin-top: 20px;
     margin-left: 20px;
     background-color: darkgreen;
+}
+
+.field-statistics {
+    position: absolute;
+    color: lightyellow;
+    font-size: 12px;
+    top: 5px;
+    left: 5px;
+    font-family: Arial;
+}
+
+#chart {
+    width: 230px;
 }
 

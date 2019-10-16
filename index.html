@@ -6,6 +6,8 @@
   <title>Artificial creatures</title>
   <link rel="stylesheet" href="css/main.css"/>
   <script src="js/lib/neataptic.min.js"></script>
+  <script src="js/lib/d3.v3.min.js"></script>
+  <script src="js/lib/frappe-charts.min.iife.js"></script>
   <script src="js/const.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/object.js"></script>
@@ -38,12 +40,13 @@
       <label for="pauseCheckbox">Pause</label>
     </div>
   </div>
-  <div class="settings">
+  <div class="statistics">
     Generation: <span id="generation"></span><br/>
     Alive: <span id="alive"></span><br/>
     Min: <span id="min"></span><br/>
     Avg: <span id="avg"></span><br/>
     Max: <span id="max"></span><br/>
+    <div id="chart"></div>
   </div>
 </div>
 </body>

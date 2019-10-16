@@ -16,7 +16,7 @@ class Creature extends MovingObject {
         this.brain = brain;
     }
 
-    doTurn(maxX, maxY, food) {
+    doTurn(food) {
 
         //life pass
         this.ttl -= DELAY;
@@ -40,10 +40,12 @@ class Creature extends MovingObject {
         if (distanceToFoodBefore.length > 0 && distanceToFoodAfter.length > 0) {
             const minDistanceAfter = Math.min(...distanceToFoodAfter);
             const minDistanceBefore = Math.min(...distanceToFoodBefore);
+
+            const reward = (minDistanceAfter > 0) ? 5 / minDistanceAfter : 0;
             if (minDistanceAfter < minDistanceBefore) {
-                this.brain.score += CLOSE_TO_FOOD_SCORE;
+                this.brain.score += reward;
             } else if (minDistanceAfter > minDistanceBefore) {
-                this.brain.score -= CLOSE_TO_FOOD_SCORE;
+                this.brain.score -= reward;
             }
         }
 
@@ -93,19 +95,23 @@ class Creature extends MovingObject {
     edgeDetection(distance) {
         let result = [0, 0, 0, 0];
 
-        if (Math.round(this.x) <= distance) {
+        if (Math.floor(this.x) <= distance) {
             result[3] = 1;
         }
-        if (Math.abs(Math.round(this.x) - (this.maxX + this.size)) <= distance) {
+        if (Math.abs(Math.ceil(this.x - this.maxX + this.size)) <= distance) {
             result[1] = 1;
         }
-        if (Math.round(this.y) <= distance) {
+        if (Math.floor(this.y) <= distance) {
             result[0] = 1;
         }
-        if (Math.abs(Math.round(this.y) - (this.maxY + this.size)) <= distance) {
+        if (Math.abs(Math.ceil(this.y - this.maxY + this.size)) <= distance) {
             result[2] = 1;
         }
 
+        //console.log(this.x , this.maxX, this.size);
+
+        //187.71254489816064 200 12.283455101839344
+        //Math.ceil(187.71254489816064 - (200 + 12.283455101839344))
         return result;
     }
 
@@ -169,5 +175,6 @@ function getVisibleFood(x, y, food, seekingDistance) {
         }
     }
 
-    return normalize(result);
+    //return normalize(result);
+    return result;
 }

@@ -6,9 +6,11 @@ class MovingObject extends SimpleObject {
         super(x, y, gameField);
         this.direction = 0;
         this.speed = 0;
+        this.maxX = this.gameField.clientWidth;
+        this.maxY = this.gameField.clientHeight;
     }
 
-    doTurn(maxX, maxY) {
+    doTurn() {
 
         this.vx = this.speed * Math.cos(this.direction) * this.step;
         this.vy = this.speed * Math.sin(this.direction) * this.step;
@@ -25,12 +27,12 @@ class MovingObject extends SimpleObject {
             this.y = 0;
         }
 
-        if (this.x > (maxX - this.size)) {
-            this.x = maxX - this.size;
+        if (this.x > (this.maxX - this.size)) {
+            this.x = this.maxX - this.size;
         }
 
-        if (this.y > (maxY - this.size)) {
-            this.y = (maxY - this.size);
+        if (this.y > (this.maxY - this.size)) {
+            this.y = (this.maxY - this.size);
         }
     }
 

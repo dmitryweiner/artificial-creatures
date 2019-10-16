@@ -57,7 +57,7 @@ class Game {
 
     handleCreatures() {
         for (let i = 0; i < this.creatures.length; i++) {
-            this.creatures[i].doTurn(this.maxX, this.maxY, this.foodStore);
+            this.creatures[i].doTurn(this.foodStore);
             this.creatures[i].checkIntersect(this.foodStore);
             if (this.creatures[i].needDelete) {
                 this.creatures[i].deleteDOMElement();
