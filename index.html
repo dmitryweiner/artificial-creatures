@@ -22,31 +22,38 @@
   <div id="gameField" class="full-screen" style="display: none">
   </div>
   <div id="trainingGameFieldsHolder">
-
   </div>
 </div>
 <div id="settings">
-  <div class="mode">
-    <div>
-      <input type="radio" id="trainingSelector" name="mode" value="training" checked />
-      <label for="trainingSelector">Training</label>
-    </div>
-    <div>
-      <input type="radio" id="liveSelector" name="mode" value="live" />
-      <label for="liveSelector">Live</label>
-    </div>
-    <div>
-      <input type="checkbox" id="pauseCheckbox" />
-      <label for="pauseCheckbox">Pause</label>
-    </div>
+  <input id="toggleView" type="button" value="[+]" />
+  <div id="shortPanel" style="display: none;">
+    G: <span class="generation"></span>
+    Alive: <span class="alive"></span>
+    Avg: <span class="avg"></span>
   </div>
-  <div class="statistics">
-    Generation: <span id="generation"></span><br/>
-    Alive: <span id="alive"></span><br/>
-    Min: <span id="min"></span><br/>
-    Avg: <span id="avg"></span><br/>
-    Max: <span id="max"></span><br/>
-    <div id="chart"></div>
+  <div id="fullPanel">
+    <div class="mode">
+      <div>
+        <input type="radio" id="trainingSelector" name="mode" value="training" checked />
+        <label for="trainingSelector">Training</label>
+      </div>
+      <div>
+        <input type="radio" id="liveSelector" name="mode" value="live" />
+        <label for="liveSelector">Live</label>
+      </div>
+      <div>
+        <input type="checkbox" id="pauseCheckbox" />
+        <label for="pauseCheckbox">Pause</label>
+      </div>
+    </div>
+    <div class="statistics">
+      Generation: <span class="generation"></span><br/>
+      Alive: <span class="alive"></span><br/>
+      Min: <span class="min"></span><br/>
+      Avg: <span class="avg"></span><br/>
+      Max: <span class="max"></span><br/>
+      <div id="chart"></div>
+    </div>
   </div>
 </div>
 </body>

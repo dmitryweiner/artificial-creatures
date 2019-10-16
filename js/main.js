@@ -6,6 +6,7 @@ const LIVE_MODE = 'live';
 document.addEventListener('DOMContentLoaded', function () {
     let currentMode = TRAINING_MODE;
     let isPaused = false;
+    let isFullPanelMode = true;
     const liveGameField = document.getElementById(GAME_FIELD_ID);
     const trainingGameFieldsHolder = document.getElementById('trainingGameFieldsHolder');
     let liveGame;
@@ -56,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 values: []
             }
         ]
-    }
+    };
     const chart = new Chart('#chart', {
         title: 'generation score history',
         type: 'line',
@@ -169,6 +170,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    const toggleView = document.getElementById('toggleView');
+    toggleView.addEventListener('click', (event) => {
+        const shortPanel = document.getElementById('shortPanel');
+        const fullPanel = document.getElementById('fullPanel');
+
+        isFullPanelMode = !isFullPanelMode;
+        if (isFullPanelMode) {
+            toggleView.innerHTML = '[-]';
+            fullPanel.style.display = 'block';
+            shortPanel.style.display = 'none';
+        } else {
+            toggleView.innerHTML = '[+]';
+            fullPanel.style.display = 'none';
+            shortPanel.style.display = 'block';
+        }
+    });
+
     /**
      *
      * @param {number[]} scores
@@ -179,11 +197,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const min = Math.min(...scores);
         const avg = sum / scores.length;
 
-        document.getElementById('min').innerHTML = '' + min.toFixed(2);
-        document.getElementById('max').innerHTML = '' + max.toFixed(2);
-        document.getElementById('avg').innerHTML = '' + avg.toFixed(2);
-        document.getElementById('alive').innerHTML = '' + aliveCount;
-        document.getElementById('generation').innerHTML = '' + generation;
+        document.querySelectorAll('.min').forEach((element) => element.innerHTML = '' + min.toFixed(2));
+        document.querySelectorAll('.max').forEach((element) => element.innerHTML = '' + max.toFixed(2));
+        document.querySelectorAll('.avg').forEach((element) => element.innerHTML = '' + avg.toFixed(2));
+        document.querySelectorAll('.alive').forEach((element) => element.innerHTML = '' + aliveCount);
+        document.querySelectorAll('.generation').forEach((element) => element.innerHTML = '' + generation);
 
         for (let i = 0; i < scores.length; i++) {
             document.getElementById('statistics' + i).innerHTML = '' + scores[i].toFixed(2);

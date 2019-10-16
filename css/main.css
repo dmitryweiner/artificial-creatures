@@ -97,3 +97,9 @@ html, body {
     width: 230px;
 }
 
+#toggleView {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
