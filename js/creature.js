@@ -24,8 +24,8 @@ class Creature extends MovingObject {
 
         //steps
         let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
-        const edgeDetectionResults = this.edgeDetection(EDGE_DETECTION_DISTANCE);
-        const activationResult = this.brain.activate([...distanceToFoodBefore, ...edgeDetectionResults]);
+        const edgeDetectionResults = this.distanceToEdge();
+        const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore), ...sigmoidize(edgeDetectionResults)]);
 
         this.direction = activationResult[0] > 1 ? 1 : activationResult[0] < 0 ? 0 : activationResult[0];
         this.direction = this.direction * 2 * Math.PI;
@@ -41,7 +41,7 @@ class Creature extends MovingObject {
             const minDistanceAfter = Math.min(...distanceToFoodAfter);
             const minDistanceBefore = Math.min(...distanceToFoodBefore);
 
-            const reward = (minDistanceAfter > 0) ? 5 / minDistanceAfter : 0;
+            const reward = (minDistanceAfter > 0) ? CLOSER_TO_FOOD_COEFFICIENT / minDistanceAfter : 0;
             if (minDistanceAfter < minDistanceBefore) {
                 this.brain.score += reward;
             } else if (minDistanceAfter > minDistanceBefore) {
@@ -50,7 +50,7 @@ class Creature extends MovingObject {
         }
 
         // punish close to edge moving
-        const edgeKillingResults = this.edgeDetection(EDGE_KILLING_DISTANCE);
+        const edgeKillingResults = this.edgeDetection();
         if (edgeKillingResults.some((e) => e === 1)) {
             this.needDelete = true;
             this.brain.score -= CLOSE_TO_EDGE_SCORE;
@@ -89,31 +89,48 @@ class Creature extends MovingObject {
 
     /**
      *
-     * @param {number} distance
      * @returns {number[]}
      */
-    edgeDetection(distance) {
+    edgeDetection() {
         let result = [0, 0, 0, 0];
 
-        if (Math.floor(this.x) <= distance) {
+        if (Math.floor(this.x) <= 0) {
             result[3] = 1;
         }
-        if (Math.abs(Math.ceil(this.x - this.maxX + this.size)) <= distance) {
+        if (Math.abs(Math.ceil(this.x - this.maxX + this.size)) <= 0) {
             result[1] = 1;
         }
-        if (Math.floor(this.y) <= distance) {
+        if (Math.floor(this.y) <= 0) {
             result[0] = 1;
         }
-        if (Math.abs(Math.ceil(this.y - this.maxY + this.size)) <= distance) {
+        if (Math.abs(Math.ceil(this.y - this.maxY + this.size)) <= 0) {
             result[2] = 1;
         }
-
-        //console.log(this.x , this.maxX, this.size);
-
-        //187.71254489816064 200 12.283455101839344
-        //Math.ceil(187.71254489816064 - (200 + 12.283455101839344))
         return result;
     }
+
+    /**
+     *
+     * @returns {number[]} 1 / dist
+     */
+    distanceToEdge() {
+        let result = [0, 0, 0, 0];
+
+        if (this.x > 0) {
+            result[3] = 1 / this.x;
+        }
+        if (Math.abs(this.x - this.maxX + this.size) > 0) {
+            result[1] = 1 / Math.abs(this.x - this.maxX + this.size);
+        }
+        if (this.y  > 0) {
+            result[0] = 1 / this.y;
+        }
+        if (Math.abs(this.y - this.maxY + this.size) > 0) {
+            result[2] = 1 / Math.abs(this.y - this.maxY + this.size);
+        }
+        return result;
+    }
+
 
     redraw() {
         MovingObject.prototype.redraw.apply(this, arguments);

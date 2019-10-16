@@ -78,6 +78,18 @@ function normalize(v) {
     return result;
 }
 
+/**
+ *
+ * {array} v
+ * @returns {array}
+ */
+function sigmoidize(v) {
+    if (!Array.isArray(v) || v.length === 0) {
+        throw new Error('Wrong parameter');
+    }
+    return v.map((element) => 1 / (1 + Math.pow(Math.E, - element)));
+}
+
 /** Get the angle from one point to another */
 function angleToPoint(x1, y1, x2, y2) {
     const d = distance(x1, y1, x2, y2);
