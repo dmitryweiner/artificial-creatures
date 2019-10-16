@@ -5,6 +5,7 @@ const LIVE_MODE = 'live';
 
 document.addEventListener('DOMContentLoaded', function () {
     let currentMode = TRAINING_MODE;
+    let isPaused = false;
     const liveGameField = document.getElementById(GAME_FIELD_ID);
     const trainingGameFieldsHolder = document.getElementById('trainingGameFieldsHolder');
     let liveGame;
@@ -36,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.setInterval(() => {
+        if (isPaused) {
+            return;
+        }
+
         if (currentMode === TRAINING_MODE) {
             // if not all died do run
             if (trainingGames.some((game) => game.currentState === RUN_STATE)) {
@@ -68,15 +73,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }, DELAY);
 
     window.setInterval(() => {
+        if (isPaused) {
+            return;
+        }
+
         if (currentMode === TRAINING_MODE) {
             trainingGames.map((game) => {
                 if(game.currentState === RUN_STATE) {
                     game.addFood();
                 }
             });
+            displayStatistics(
+                trainingGames.map((game) => game.neat.population[0].score),
+                trainingGames.filter((game) => game.currentState === RUN_STATE).length,
+                neat.generation
+            );
         } else {
             if (liveGame.currentState === RUN_STATE) {
                 liveGame.addFood();
+                displayStatistics(
+                    liveGame.neat.population.map((brain) => brain.score),
+                    liveGame.creatures.length,
+                    liveGame.neat.generation
+                );
             }
         }
     }, FOOD_DELAY);
@@ -105,6 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    document.getElementById('pauseCheckbox').addEventListener('change', (event) => {
+        if(event.target.checked) {
+            isPaused = true;
+        } else {
+            isPaused = false;
+        }
+    });
 });
 
 function mutate(neat) {
@@ -124,4 +150,21 @@ function mutate(neat) {
 
     neat.generation++;
     return neat;
+}
+
+/**
+ *
+ * @param {number[]} scores
+ */
+function displayStatistics(scores, aliveCount, generation) {
+    const sum = scores.reduce((sum, x) => sum + x);
+    const max = Math.max(...scores);
+    const min = Math.min(...scores);
+    const avg = sum / scores.length;
+
+    document.getElementById('min').innerHTML = '' + min;
+    document.getElementById('max').innerHTML = '' + max;
+    document.getElementById('avg').innerHTML = '' + avg;
+    document.getElementById('alive').innerHTML = '' + aliveCount;
+    document.getElementById('generation').innerHTML = '' + generation;
 }

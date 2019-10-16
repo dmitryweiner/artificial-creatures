@@ -93,16 +93,16 @@ class Creature extends MovingObject {
     edgeDetection(distance) {
         let result = [0, 0, 0, 0];
 
-        if (this.x <= distance) {
+        if (Math.round(this.x) <= distance) {
             result[3] = 1;
         }
-        if (Math.abs(this.x - (this.maxX - this.size)) <= distance) {
+        if (Math.abs(Math.round(this.x) - (this.maxX + this.size)) <= distance) {
             result[1] = 1;
         }
-        if (this.y <= distance) {
+        if (Math.round(this.y) <= distance) {
             result[0] = 1;
         }
-        if (Math.abs(this.y - (this.maxY - this.size)) <= distance) {
+        if (Math.abs(Math.round(this.y) - (this.maxY + this.size)) <= distance) {
             result[2] = 1;
         }
 

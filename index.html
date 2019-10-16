@@ -26,15 +26,20 @@
 <div id="settings">
   <div class="mode">
     <div>
-      <input type="radio" id="trainingSelector" name="mode" value="training" checked>
+      <input type="radio" id="trainingSelector" name="mode" value="training" checked />
       <label for="trainingSelector">Training</label>
     </div>
     <div>
-      <input type="radio" id="liveSelector" name="mode" value="live">
+      <input type="radio" id="liveSelector" name="mode" value="live" />
       <label for="liveSelector">Live</label>
+    </div>
+    <div>
+      <input type="checkbox" id="pauseCheckbox" />
+      <label for="pauseCheckbox">Pause</label>
     </div>
   </div>
   <div class="settings">
+    Generation: <span id="generation"></span><br/>
     Alive: <span id="alive"></span><br/>
     Min: <span id="min"></span><br/>
     Avg: <span id="avg"></span><br/>

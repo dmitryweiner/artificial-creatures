@@ -1,8 +1,8 @@
 'use strict';
 
 const GAME_FIELD_ID = 'gameField';
-const DELAY = 50;
-const FOOD_DELAY = 2000;
+const DELAY = 10;
+const FOOD_DELAY = 1000;
 const MAX_TTL = 50000;
 const POPULATION_SIZE = 10;
 const ELITISM = 5;
