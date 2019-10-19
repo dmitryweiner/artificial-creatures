@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const trainingGameFieldsHolder = document.getElementById('trainingGameFieldsHolder');
     let liveGame;
     let trainingGames = [];
+    let neat;
 
     for (let i = 0; i < POPULATION_SIZE; i++) {
         const trainingGameField = document.createElement('div');
@@ -21,43 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
         statistics.setAttribute('class', 'field-statistics');
         trainingGameField.appendChild(statistics);
         trainingGameFieldsHolder.appendChild(trainingGameField);
-        const trainingGame = new Game(trainingGameField, 1);
-        trainingGame.start();
-        trainingGames.push(trainingGame);
     }
-    let neat = new neataptic.Neat(
-        SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
-        2, // output channels: angle and speed
-        null, // ranking function
-        {
-            popsize: POPULATION_SIZE,
-            elitism: ELITISM,
-            mutationRate: MUTATION_RATE,
-            mutationAmount: MUTATION_AMOUNT,
-        }
-    );
-    neataptic.Config.warnings = false;
-    for (let i = 0; i < neat.popsize; i++) {
-        neat.population[i].score = 0;
-    }
+    initTrainingGames();
 
-    const chartData = {
-        labels: [],
-        datasets: [
-            {
-                name: 'Max',
-                values: []
-            },
-            {
-                name: 'Average',
-                values: []
-            },
-            {
-                name: 'Min',
-                values: []
-            }
-        ]
-    };
+    let chartData = getInitialChartData();
     const chart = new Chart('#chart', {
         title: 'generation score history',
         type: 'line',
@@ -144,18 +112,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('trainingSelector').addEventListener('change', (event) => {
         if(event.target.checked) {
+            liveGameField.style.display = 'none';
+            trainingGameFieldsHolder.style.display = 'flex';
             currentMode = TRAINING_MODE;
 
-            // TODO: init training games
+            if (liveGame) {
+                liveGame.stop();
+            }
+
+            // init training games
+            initTrainingGames();
         }
     });
 
     document.getElementById('liveSelector').addEventListener('change', (event) => {
         if(event.target.checked) {
+            liveGameField.style.display = 'block';
+            trainingGameFieldsHolder.style.display = 'none';
+
+            trainingGames.forEach((game) => game.stop());
             currentMode = LIVE_MODE;
 
-            //TODO: gather population from training games
-            let population = [];
+            // gather population from training games
+            let population = trainingGames.map((game) => game.neat.population[0]);
 
             liveGame = new Game(liveGameField, POPULATION_SIZE, population);
             liveGame.start();
@@ -224,6 +203,52 @@ document.addEventListener('DOMContentLoaded', function () {
             chartData.datasets.forEach(d => d.values.shift());
         }
         chart.update(chartData);
+    }
+
+    function initTrainingGames() {
+
+        trainingGames = [];
+
+        for (let i = 0; i < POPULATION_SIZE; i++) {
+            const trainingGameField = document.getElementById('trainingGameField' + i);
+            const trainingGame = new Game(trainingGameField, 1);
+            trainingGame.start();
+            trainingGames.push(trainingGame);
+        }
+        neat = new neataptic.Neat(
+            SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+            2, // output channels: angle and speed
+            null, // ranking function
+            {
+                popsize: POPULATION_SIZE,
+                elitism: ELITISM,
+                mutationRate: MUTATION_RATE,
+                mutationAmount: MUTATION_AMOUNT,
+            }
+        );
+        for (let i = 0; i < neat.popsize; i++) {
+            neat.population[i].score = 0;
+        }
+    }
+
+    function getInitialChartData() {
+        return {
+            labels: [],
+            datasets: [
+                {
+                    name: 'Max',
+                    values: []
+                },
+                {
+                    name: 'Average',
+                    values: []
+                },
+                {
+                    name: 'Min',
+                    values: []
+                }
+            ]
+        };
     }
 });
 

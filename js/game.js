@@ -40,6 +40,11 @@ class Game {
         this.currentState = RUN_STATE;
     }
 
+    stop() {
+        this.removeAll();
+        this.currentState = STOP_STATE;
+    }
+
     createCreatures(brains) {
         let result = [];
         for (let i = 0; i < this.popSize; i++) {
@@ -86,12 +91,12 @@ class Game {
     mutate() {
         this.neat.sort();
 
-        console.log({
+        /*console.log({
             generation: this.neat.generation,
             max: this.neat.getFittest().score,
             avg: Math.round(this.neat.getAverage()),
             min: this.neat.population[this.neat.popsize - 1].score
-        });
+        });*/
 
         const newGeneration = [];
         for (let i = 0; i < this.neat.elitism; i++) {

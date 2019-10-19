@@ -15,7 +15,6 @@ html, body {
 
 #gameField {
     background-color: darkgreen;
-    position: relative;
 }
 
 .full-screen {
