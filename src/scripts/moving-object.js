@@ -1,6 +1,6 @@
-'use strict';
+import SimpleObject from "./object";
 
-class MovingObject extends SimpleObject {
+export default class MovingObject extends SimpleObject {
 
     constructor(x, y, gameField) {
         super(x, y, gameField);

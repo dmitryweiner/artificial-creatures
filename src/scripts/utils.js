@@ -1,6 +1,6 @@
 'use strict';
 
-function generateId()
+export function generateId()
 {
     var text = '';
     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -15,7 +15,7 @@ function generateId()
  * Returns random emoji char like rat or mouse
  * @returns {string}
  */
-function getEmojiForCreature() {
+export function getEmojiForCreature() {
     const emoji = [
         '\u{1F400}',
         '\u{1F407}',
@@ -41,7 +41,7 @@ function getEmojiForCreature() {
  * Returns food emoji
  * @returns {string}
  */
-function getEmojiForFood() {
+export function getEmojiForFood() {
     const emoji = [
         '\u{1F966}',
         '\u{1F344}',
@@ -66,7 +66,7 @@ function getEmojiForFood() {
  * {array} v
  * @returns {array}
  */
-function normalize(v) {
+export function normalize(v) {
     if (!Array.isArray(v) || v.length === 0) {
         throw new Error('Wrong parameter');
     }
@@ -83,7 +83,7 @@ function normalize(v) {
  * {array} v
  * @returns {array}
  */
-function sigmoidize(v) {
+export function sigmoidize(v) {
     if (!Array.isArray(v) || v.length === 0) {
         throw new Error('Wrong parameter');
     }
@@ -91,7 +91,7 @@ function sigmoidize(v) {
 }
 
 /** Get the angle from one point to another */
-function angleToPoint(x1, y1, x2, y2) {
+export function angleToPoint(x1, y1, x2, y2) {
     const d = distance(x1, y1, x2, y2);
     const dx = (x2 - x1) / d;
     const dy = (y2 - y1) / d;
@@ -102,7 +102,7 @@ function angleToPoint(x1, y1, x2, y2) {
 }
 
 /** Calculate distance between two points */
-function distance(x1, y1, x2, y2) {
+export function distance(x1, y1, x2, y2) {
     const dx = x1 - x2;
     const dy = y1 - y2;
 

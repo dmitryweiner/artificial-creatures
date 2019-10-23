@@ -1,6 +1,7 @@
-'use strict';
+import SimpleObject from "./object";
+import { getEmojiForFood } from './utils';
 
-class Food extends SimpleObject {
+export default class Food extends SimpleObject {
 
     static SIZE = 20;
 

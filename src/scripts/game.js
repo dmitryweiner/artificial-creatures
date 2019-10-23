@@ -1,9 +1,11 @@
-'use strict';
+import * as constants from './const';
+import Creature from './creature';
+import Food from './food';
 
-const STOP_STATE = 0;
-const RUN_STATE = 1;
+export const STOP_STATE = 0;
+export const RUN_STATE = 1;
 
-class Game {
+export default class Game {
 
     constructor(gameField, popSize, population) {
         this.gameField = gameField;
@@ -15,14 +17,14 @@ class Game {
         this.creatures = [];
         this.foodStore = [];
         this.neat = new neataptic.Neat(
-            SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+            constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
             2, // output channels: angle and speed
             null, // ranking function
             {
                 popsize: popSize,
-                elitism: ELITISM,
-                mutationRate: MUTATION_RATE,
-                mutationAmount: MUTATION_AMOUNT,
+                elitism: constants.ELITISM,
+                mutationRate: constants.MUTATION_RATE,
+                mutationAmount: constants.MUTATION_AMOUNT,
             }
         );
         neataptic.Config.warnings = false;

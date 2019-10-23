@@ -1,4 +1,7 @@
-'use strict';
+import '../styles/index.scss';
+import * as constants from './const';
+import Game from './game';
+import { RUN_STATE } from './game';
 
 const TRAINING_MODE = 'training';
 const LIVE_MODE = 'live';
@@ -7,13 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentMode = TRAINING_MODE;
     let isPaused = false;
     let isFullPanelMode = true;
-    const liveGameField = document.getElementById(GAME_FIELD_ID);
+    const liveGameField = document.getElementById(constants.GAME_FIELD_ID);
     const trainingGameFieldsHolder = document.getElementById('trainingGameFieldsHolder');
     let liveGame;
     let trainingGames = [];
     let neat;
 
-    for (let i = 0; i < POPULATION_SIZE; i++) {
+    for (let i = 0; i < constants.POPULATION_SIZE; i++) {
         const trainingGameField = document.createElement('div');
         trainingGameField.setAttribute('id', 'trainingGameField' + i);
         trainingGameField.setAttribute('class', 'training-game-field');
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 trainingGames.map((game) => game.removeAll());
                 trainingGames = [];
-                for (let i = 0; i < POPULATION_SIZE; i++) {
+                for (let i = 0; i < constants.POPULATION_SIZE; i++) {
                     const newGame = new Game(
                         document.getElementById('trainingGameField' + i),
                         1,
@@ -76,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 liveGame.start();
             }
         }
-    }, DELAY);
+    }, constants.DELAY);
 
     window.setInterval(() => {
         if (isPaused) {
@@ -104,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
             }
         }
-    }, FOOD_DELAY);
+    }, constants.FOOD_DELAY);
 
     liveGameField.addEventListener('click', (event) => {
         liveGame.addFood(event.clientX, event.clientY);
@@ -136,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // gather population from training games
             let population = trainingGames.map((game) => game.neat.population[0]);
 
-            liveGame = new Game(liveGameField, POPULATION_SIZE, population);
+            liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
             liveGame.start();
         }
     });
@@ -209,21 +212,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         trainingGames = [];
 
-        for (let i = 0; i < POPULATION_SIZE; i++) {
+        for (let i = 0; i < constants.POPULATION_SIZE; i++) {
             const trainingGameField = document.getElementById('trainingGameField' + i);
             const trainingGame = new Game(trainingGameField, 1);
             trainingGame.start();
             trainingGames.push(trainingGame);
         }
         neat = new neataptic.Neat(
-            SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+            constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
             2, // output channels: angle and speed
             null, // ranking function
             {
-                popsize: POPULATION_SIZE,
-                elitism: ELITISM,
-                mutationRate: MUTATION_RATE,
-                mutationAmount: MUTATION_AMOUNT,
+                popsize: constants.POPULATION_SIZE,
+                elitism: constants.ELITISM,
+                mutationRate: constants.MUTATION_RATE,
+                mutationAmount: constants.MUTATION_AMOUNT,
             }
         );
         for (let i = 0; i < neat.popsize; i++) {

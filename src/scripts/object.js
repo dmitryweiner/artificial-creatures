@@ -1,6 +1,6 @@
-'use strict';
+import { generateId } from './utils';
 
-class SimpleObject {
+export default class SimpleObject {
 
     static SIZE = 10;
 

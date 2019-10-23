@@ -1,14 +1,15 @@
-'use strict';
+import * as constants from './const';
+import MovingObject from './moving-object';
+import Food from './food';
+import { getEmojiForCreature, sigmoidize, distance, angleToPoint } from './utils';
 
-const SIZE = 20;
-
-class Creature extends MovingObject {
+export default class Creature extends MovingObject {
 
     static SIZE = 20;
 
     constructor(x, y, gameField, brain) {
         super(x, y, gameField);
-        this.ttl = MAX_TTL - Math.random() * MAX_TTL / 2;
+        this.ttl = constants.MAX_TTL - Math.random() * constants.MAX_TTL / 2;
         this.size = convertTtlToSize(this.ttl);
         this.sign = getEmojiForCreature();
         this.needDelete = false;
@@ -19,11 +20,11 @@ class Creature extends MovingObject {
     doTurn(food) {
 
         //life pass
-        this.ttl -= DELAY;
+        this.ttl -= constants.DELAY;
         this.size = convertTtlToSize(this.ttl);
 
         //steps
-        let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
+        let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, constants.MAX_SEEKING_DISTANCE);
         const edgeDetectionResults = this.distanceToEdge();
         const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore), ...sigmoidize(edgeDetectionResults)]);
 
@@ -34,14 +35,14 @@ class Creature extends MovingObject {
         MovingObject.prototype.doTurn.apply(this, arguments); // call super
 
         // moving to food reward
-        let distanceToFoodAfter = getVisibleFood(this.x, this.y, food, MAX_SEEKING_DISTANCE);
+        let distanceToFoodAfter = getVisibleFood(this.x, this.y, food, constants.MAX_SEEKING_DISTANCE);
         distanceToFoodAfter = distanceToFoodAfter.filter((e) => e > 0); // delete zeroes
         distanceToFoodBefore = distanceToFoodBefore.filter((e) => e > 0); // delete zeroes
         if (distanceToFoodBefore.length > 0 && distanceToFoodAfter.length > 0) {
             const minDistanceAfter = Math.min(...distanceToFoodAfter);
             const minDistanceBefore = Math.min(...distanceToFoodBefore);
 
-            const reward = (minDistanceAfter > 0) ? CLOSER_TO_FOOD_COEFFICIENT / minDistanceAfter : 0;
+            const reward = (minDistanceAfter > 0) ? constants.CLOSER_TO_FOOD_COEFFICIENT / minDistanceAfter : 0;
             if (minDistanceAfter < minDistanceBefore) {
                 this.brain.score += reward;
             } else if (minDistanceAfter > minDistanceBefore) {
@@ -53,12 +54,12 @@ class Creature extends MovingObject {
         const edgeKillingResults = this.edgeDetection();
         if (edgeKillingResults.some((e) => e === 1)) {
             this.needDelete = true;
-            this.brain.score -= CLOSE_TO_EDGE_SCORE;
+            this.brain.score -= constants.CLOSE_TO_EDGE_SCORE;
         }
 
         if (this.ttl < 0) {
             this.needDelete = true;
-            this.brain.score -= DEATH_SCORE; // punish death
+            this.brain.score -= constants.DEATH_SCORE; // punish death
         }
 
         if (!this.needDelete) {
@@ -82,7 +83,7 @@ class Creature extends MovingObject {
             if (distance(food.x, food.y, this.x, this.y) < (Food.SIZE + this.size) / 2) {
                 foodStore[i].needDelete = true;
                 this.ttl += 10000; // TODO: const?
-                this.brain.score += FOUND_FOOD_SCORE;
+                this.brain.score += constants.FOUND_FOOD_SCORE;
             }
         }
     }
@@ -149,12 +150,12 @@ class Creature extends MovingObject {
  * @returns {number}
  */
 function convertTtlToSize(ttl) {
-    const result = Creature.SIZE * (ttl / MAX_TTL);
+    const result = Creature.SIZE * (ttl / constants.MAX_TTL);
     return result < 10 ? 10 : result;
 }
 
 function convertTtlToFontSize(ttl) {
-    const result = 18 * (ttl / MAX_TTL);
+    const result = 18 * (ttl / constants.MAX_TTL);
     return result < 10 ? 10 : result;
 }
 
@@ -176,11 +177,11 @@ function getVisibleFood(x, y, food, seekingDistance) {
         }
     }
 
-    for (let i = 0; i < SECTORS_OF_VISION; i++) {
+    for (let i = 0; i < constants.SECTORS_OF_VISION; i++) {
         let angleBegin, angleEnd;
         result[i] = 0;
-        angleBegin = i * 2 * Math.PI / SECTORS_OF_VISION;
-        angleEnd = (i + 1) * 2 * Math.PI / SECTORS_OF_VISION;
+        angleBegin = i * 2 * Math.PI / constants.SECTORS_OF_VISION;
+        angleEnd = (i + 1) * 2 * Math.PI / constants.SECTORS_OF_VISION;
         for (const foodItem of nearestFood) {
             const angle = angleToPoint(x, y, foodItem.x, foodItem.y);
             const foodDistance = distance(x, y, foodItem.x, foodItem.y);
