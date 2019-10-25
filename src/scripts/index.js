@@ -4,6 +4,8 @@ import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
 import { mutate } from './utils.mjs';
 import population from './population.mjs';
+import neataptic from 'neataptic';
+import { createNeatapticObject } from './utils.mjs';
 
 const TRAINING_MODE = 'training';
 const LIVE_MODE = 'live';
@@ -217,33 +219,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initTrainingGames(population = null) {
 
+        neat = createNeatapticObject();
+
+        if (population) {
+            neat.population = population.map((brain) => neataptic.Network.fromJSON(brain));
+        }
+
+        for (let i = 0; i < neat.popsize; i++) {
+            console.log(neat.population[i]);
+            neat.population[i].score = 0;
+        }
+
         trainingGames = [];
 
         for (let i = 0; i < constants.POPULATION_SIZE; i++) {
             const trainingGameField = document.getElementById('trainingGameField' + i);
-            const trainingGame = new Game(trainingGameField, 1);
+            const trainingGame = new Game(trainingGameField, 1, [neat.population[i]]);
             trainingGame.start();
             trainingGames.push(trainingGame);
         }
-        neat = new neataptic.Neat(
-            constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
-            2, // output channels: angle and speed
-            null, // ranking function
-            {
-                popsize: constants.POPULATION_SIZE,
-                elitism: constants.ELITISM,
-                mutationRate: constants.MUTATION_RATE,
-                mutationAmount: constants.MUTATION_AMOUNT,
-            }
-        );
 
-        if (population) {
-            neat.population = population;
-        }
 
-        for (let i = 0; i < neat.popsize; i++) {
-            neat.population[i].score = 0;
-        }
     }
 
     function getInitialChartData() {

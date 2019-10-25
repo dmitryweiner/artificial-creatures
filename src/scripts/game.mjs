@@ -1,7 +1,6 @@
-import neataptic from 'neataptic';
-import * as constants from './const.mjs';
 import Creature from './creature.mjs';
 import Food from './food.mjs';
+import { createNeatapticObject } from './utils.mjs';
 
 export const STOP_STATE = 0;
 export const RUN_STATE = 1;
@@ -18,17 +17,7 @@ export default class Game {
         this.creatures = [];
         this.foodStore = [];
 
-        this.neat = new neataptic.Neat(
-            constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
-            2, // output channels: angle and speed
-            null, // ranking function
-            {
-                popsize: popSize,
-                elitism: constants.ELITISM,
-                mutationRate: constants.MUTATION_RATE,
-                mutationAmount: constants.MUTATION_AMOUNT,
-            }
-        );
+        this.neat = createNeatapticObject(popSize);
         if (population) {
             this.neat.population = population;
         }
@@ -137,8 +126,8 @@ export default class Game {
             foodX = x;
             foodY = y;
         } else {
-            foodX = (this.maxX - Food.SIZE) * Math.random();
-            foodY = (this.maxY - Food.SIZE) * Math.random();
+            foodX = Food.SIZE + (this.maxX - Food.SIZE * 2) * Math.random();
+            foodY = Food.SIZE + (this.maxY - Food.SIZE * 2) * Math.random();
         }
 
         const food = new Food(foodX, foodY, this.gameField);

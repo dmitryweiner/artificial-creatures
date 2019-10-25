@@ -158,11 +158,15 @@ export default class Creature extends MovingObject {
  * @returns {number}
  */
 function convertTtlToSize(ttl) {
+    return Creature.SIZE;
+
     const result = Creature.SIZE * (ttl / constants.MAX_TTL);
     return result < 10 ? 10 : result;
 }
 
 function convertTtlToFontSize(ttl) {
+    return 18;
+    
     const result = 18 * (ttl / constants.MAX_TTL);
     return result < 10 ? 10 : result;
 }

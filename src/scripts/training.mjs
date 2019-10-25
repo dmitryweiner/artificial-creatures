@@ -1,31 +1,21 @@
-import neataptic from 'neataptic';
 import fs from 'fs';
 import * as constants from './const.mjs';
 import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
 import { mutate } from './utils.mjs';
+import { createNeatapticObject } from './utils.mjs';
 
 let trainingGames = [];
 let neat;
 
 for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-    const trainingGameField = generateFakeDOMElement('trainingGameField' + i, 100, 100);
+    const trainingGameField = generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE);
     const trainingGame = new Game(trainingGameField, 1);
     trainingGame.start();
     trainingGames.push(trainingGame);
 }
 
-neat = new neataptic.Neat(
-    constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
-    2, // output channels: angle and speed
-    null, // ranking function
-    {
-        popsize: constants.POPULATION_SIZE,
-        elitism: constants.ELITISM,
-        mutationRate: constants.MUTATION_RATE,
-        mutationAmount: constants.MUTATION_AMOUNT,
-    }
-);
+neat = createNeatapticObject();
 for (let i = 0; i < neat.popsize; i++) {
     neat.population[i].score = 0;
 }
@@ -52,7 +42,7 @@ setInterval(() => {
         trainingGames = [];
         for (let i = 0; i < constants.POPULATION_SIZE; i++) {
             const newGame = new Game(
-                generateFakeDOMElement('trainingGameField' + i, 100, 100),
+                generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE),
                 1,
                 [neat.population[i]]
             );
@@ -60,7 +50,7 @@ setInterval(() => {
             newGame.start();
         }
     }
-}, constants.DELAY / 10);
+}, 0);
 
 function displayStatistics(scores, generation) {
     const sum = scores.reduce((sum, x) => sum + x);
