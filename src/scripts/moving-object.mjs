@@ -1,4 +1,4 @@
-import SimpleObject from "./object";
+import SimpleObject from './object.mjs';
 
 export default class MovingObject extends SimpleObject {
 
@@ -37,6 +37,10 @@ export default class MovingObject extends SimpleObject {
     }
 
     redraw() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         const element = document.getElementById(this.id);
         element.style.left = this.x + 'px';
         element.style.top = this.y + 'px';

@@ -4,7 +4,8 @@
   "description": "A light foundation for your next frontend project based on webpack.",
   "scripts": {
     "build": "NODE_ENV=production webpack --config webpack/webpack.config.prod.js  --colors",
-    "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js"
+    "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
+    "train": "node --experimental-modules ./src/scripts/training.mjs"
   },
   "repository": {
     "type": "git",
@@ -47,6 +48,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
-    "core-js": "^3.3.2"
+    "core-js": "^3.3.2",
+    "neataptic": "^1.4.7"
   }
 }

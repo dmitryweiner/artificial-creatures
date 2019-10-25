@@ -1,7 +1,7 @@
-import * as constants from './const';
-import MovingObject from './moving-object';
-import Food from './food';
-import { getEmojiForCreature, sigmoidize, distance, angleToPoint } from './utils';
+import * as constants from './const.mjs';
+import MovingObject from './moving-object.mjs';
+import Food from './food.mjs';
+import { getEmojiForCreature, sigmoidize, distance, angleToPoint } from './utils.mjs';
 
 export default class Creature extends MovingObject {
 
@@ -68,6 +68,10 @@ export default class Creature extends MovingObject {
     }
 
     createDOMElement() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         const element = document.createElement('div');
         element.setAttribute('id', this.id);
         element.innerHTML = this.sign;
@@ -134,6 +138,10 @@ export default class Creature extends MovingObject {
 
 
     redraw() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         MovingObject.prototype.redraw.apply(this, arguments);
         const element = document.getElementById(this.id);
 

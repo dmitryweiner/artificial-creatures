@@ -1,7 +1,9 @@
 import '../styles/index.scss';
-import * as constants from './const';
-import Game from './game';
-import { RUN_STATE } from './game';
+import * as constants from './const.mjs';
+import Game from './game.mjs';
+import { RUN_STATE } from './game.mjs';
+import { mutate } from './utils.mjs';
+import population from './population.mjs';
 
 const TRAINING_MODE = 'training';
 const LIVE_MODE = 'live';
@@ -26,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         trainingGameField.appendChild(statistics);
         trainingGameFieldsHolder.appendChild(trainingGameField);
     }
-    initTrainingGames();
+    initTrainingGames(population);
 
     let chartData = getInitialChartData();
     const chart = new Chart('#chart', {
@@ -51,11 +53,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     game.run();
                 });
             } else { // else mutate
-                //TODO: gather population from training games
                 updateGraph(
                     trainingGames.map((game) => game.neat.population[0].score),
                     neat.generation
                 );
+
+                // gather population from training games
                 neat.population = trainingGames.map((game) => game.neat.population[0]);
                 neat = mutate(neat);
 
@@ -123,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 liveGame.stop();
             }
 
+            chartData = getInitialChartData();
+
             // init training games
             initTrainingGames();
         }
@@ -138,6 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // gather population from training games
             let population = trainingGames.map((game) => game.neat.population[0]);
+
+            chartData = getInitialChartData();
 
             liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
             liveGame.start();
@@ -159,11 +166,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         isFullPanelMode = !isFullPanelMode;
         if (isFullPanelMode) {
-            toggleView.innerHTML = '[-]';
+            toggleView.value = '[-]';
             fullPanel.style.display = 'block';
             shortPanel.style.display = 'none';
         } else {
-            toggleView.innerHTML = '[+]';
+            toggleView.value = '[+]';
             fullPanel.style.display = 'none';
             shortPanel.style.display = 'block';
         }
@@ -208,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chart.update(chartData);
     }
 
-    function initTrainingGames() {
+    function initTrainingGames(population = null) {
 
         trainingGames = [];
 
@@ -229,6 +236,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 mutationAmount: constants.MUTATION_AMOUNT,
             }
         );
+
+        if (population) {
+            neat.population = population;
+        }
+
         for (let i = 0; i < neat.popsize; i++) {
             neat.population[i].score = 0;
         }
@@ -254,22 +266,3 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 });
-
-function mutate(neat) {
-    neat.sort();
-
-    const newGeneration = [];
-    for (let i = 0; i < neat.elitism; i++) {
-        newGeneration.push(neat.population[i]);
-    }
-    for (let i = 0; i < neat.popsize - neat.elitism; i++) {
-        const offspring = neat.getOffspring();
-        offspring.score = 0;
-        newGeneration.push(offspring);
-    }
-    neat.population = newGeneration;
-    neat.mutate();
-
-    neat.generation++;
-    return neat;
-}

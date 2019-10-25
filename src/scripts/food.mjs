@@ -1,5 +1,5 @@
-import SimpleObject from "./object";
-import { getEmojiForFood } from './utils';
+import SimpleObject from './object.mjs';
+import { getEmojiForFood } from './utils.mjs';
 
 export default class Food extends SimpleObject {
 
@@ -11,6 +11,10 @@ export default class Food extends SimpleObject {
     }
 
     createDOMElement() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         const element = document.createElement('div');
         element.setAttribute('id', this.id);
         element.innerHTML = this.sign;

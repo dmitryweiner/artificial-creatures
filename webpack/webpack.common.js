@@ -34,7 +34,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.mjs$/,
+        test: /\.js$/,
         include: /node_modules/,
         type: 'javascript/auto'
       },

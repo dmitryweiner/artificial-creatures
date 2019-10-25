@@ -1,6 +1,7 @@
-import * as constants from './const';
-import Creature from './creature';
-import Food from './food';
+import neataptic from 'neataptic';
+import * as constants from './const.mjs';
+import Creature from './creature.mjs';
+import Food from './food.mjs';
 
 export const STOP_STATE = 0;
 export const RUN_STATE = 1;
@@ -16,6 +17,7 @@ export default class Game {
 
         this.creatures = [];
         this.foodStore = [];
+
         this.neat = new neataptic.Neat(
             constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
             2, // output channels: angle and speed
@@ -27,7 +29,6 @@ export default class Game {
                 mutationAmount: constants.MUTATION_AMOUNT,
             }
         );
-        neataptic.Config.warnings = false;
         if (population) {
             this.neat.population = population;
         }

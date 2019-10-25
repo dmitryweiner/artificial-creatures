@@ -1,5 +1,3 @@
-'use strict';
-
 export function generateId()
 {
     var text = '';
@@ -107,4 +105,23 @@ export function distance(x1, y1, x2, y2) {
     const dy = y1 - y2;
 
     return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function mutate(neat) {
+    neat.sort();
+
+    const newGeneration = [];
+    for (let i = 0; i < neat.elitism; i++) {
+        newGeneration.push(neat.population[i]);
+    }
+    for (let i = 0; i < neat.popsize - neat.elitism; i++) {
+        const offspring = neat.getOffspring();
+        offspring.score = 0;
+        newGeneration.push(offspring);
+    }
+    neat.population = newGeneration;
+    neat.mutate();
+
+    neat.generation++;
+    return neat;
 }

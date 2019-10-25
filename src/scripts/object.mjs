@@ -1,4 +1,4 @@
-import { generateId } from './utils';
+import { generateId } from './utils.mjs';
 
 export default class SimpleObject {
 
@@ -14,12 +14,20 @@ export default class SimpleObject {
     }
 
     createDOMElement() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         const element = document.createElement('div');
         element.setAttribute('id', this.id);
         this.gameField.appendChild(element);
     }
 
     deleteDOMElement() {
+        if (this.gameField.isFake) {
+            return;
+        }
+
         const element = document.getElementById(this.id);
         element.parentNode.removeChild(element);
     }
