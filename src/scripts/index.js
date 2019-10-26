@@ -11,7 +11,7 @@ const TRAINING_MODE = 'training';
 const LIVE_MODE = 'live';
 
 document.addEventListener('DOMContentLoaded', function () {
-    let currentMode = TRAINING_MODE;
+    let currentMode = LIVE_MODE;
     let isPaused = false;
     let isFullPanelMode = true;
     const liveGameField = document.getElementById(constants.GAME_FIELD_ID);
@@ -30,7 +30,16 @@ document.addEventListener('DOMContentLoaded', function () {
         trainingGameField.appendChild(statistics);
         trainingGameFieldsHolder.appendChild(trainingGameField);
     }
-    initTrainingGames(population);
+
+    if (currentMode === TRAINING_MODE) {
+        liveGameField.style.display = 'none';
+        trainingGameFieldsHolder.style.display = 'flex';
+        initTrainingGames(population.map((brain) => neataptic.Network.fromJSON(brain)));
+    } else {
+        liveGameField.style.display = 'block';
+        trainingGameFieldsHolder.style.display = 'none';
+        initLiveGame(population.map((brain) => neataptic.Network.fromJSON(brain)));
+    }
 
     let chartData = getInitialChartData();
     const chart = new Chart('#chart', {
@@ -133,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chart.update(chartData);
 
             // init training games
-            initTrainingGames();
+            initTrainingGames(liveGame.neat.population);
         }
     });
 
@@ -151,8 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chartData = getInitialChartData();
             chart.update(chartData);
 
-            liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
-            liveGame.start();
+            initLiveGame(population);
         }
     });
 
@@ -225,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
         neat = createNeatapticObject();
 
         if (population) {
-            neat.population = population.map((brain) => neataptic.Network.fromJSON(brain));
+            neat.population = population;
         }
 
         for (let i = 0; i < neat.popsize; i++) {
@@ -240,8 +248,11 @@ document.addEventListener('DOMContentLoaded', function () {
             trainingGame.start();
             trainingGames.push(trainingGame);
         }
+    }
 
-
+    function initLiveGame(population) {
+        liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
+        liveGame.start();
     }
 
     function getInitialChartData() {
