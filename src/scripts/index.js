@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let chartData = getInitialChartData();
     const chart = new Chart('#chart', {
-        title: 'generation score history',
         type: 'line',
         height: 200,
         data: chartData

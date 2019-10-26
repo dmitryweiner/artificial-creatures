@@ -10,7 +10,7 @@ export default class Creature extends MovingObject {
 
     constructor(x, y, gameField, brain) {
         super(x, y, gameField);
-        this.ttl = constants.MAX_TTL - Math.random() * constants.MAX_TTL / 2;
+        this.ttl = constants.MAX_TTL;
         this.size = convertTtlToSize(this.ttl);
         this.sign = getEmojiForCreature();
         this.needDelete = false;

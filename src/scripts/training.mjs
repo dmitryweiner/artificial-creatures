@@ -4,20 +4,28 @@ import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
 import { mutate } from './utils.mjs';
 import { createNeatapticObject } from './utils.mjs';
+import population from './population.mjs';
+import neataptic from "neataptic";
 
 let trainingGames = [];
 let neat;
 
-for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-    const trainingGameField = generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE);
-    const trainingGame = new Game(trainingGameField, 1);
-    trainingGame.start();
-    trainingGames.push(trainingGame);
+neat = createNeatapticObject();
+
+if (typeof process.argv[2] !== 'undefined' && process.argv[2] === 'continue') {
+    console.log('Loading trained population.');
+    neat.population = population.map((brain) => neataptic.Network.fromJSON(brain));
 }
 
-neat = createNeatapticObject();
 for (let i = 0; i < neat.popsize; i++) {
     neat.population[i].score = 0;
+}
+
+for (let i = 0; i < constants.POPULATION_SIZE; i++) {
+    const trainingGameField = generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE);
+    const trainingGame = new Game(trainingGameField, 1, [neat.population[i]]);
+    trainingGame.start();
+    trainingGames.push(trainingGame);
 }
 
 setInterval(() => {

@@ -138,30 +138,25 @@ export function createNeatapticObject(popSize = null) {
         2, // output channels: angle and speed
         null, // ranking function
         {
-            // mutation: [
-            //     neataptic.methods.mutation.ADD_NODE,
-            //     neataptic.methods.mutation.SUB_NODE,
-            //     neataptic.methods.mutation.ADD_CONN,
-            //     neataptic.methods.mutation.SUB_CONN,
-            //     neataptic.methods.mutation.MOD_WEIGHT,
-            //     neataptic.methods.mutation.MOD_BIAS,
-            //     neataptic.methods.mutation.MOD_ACTIVATION,
-            //     neataptic.methods.mutation.ADD_GATE,
-            //     neataptic.methods.mutation.SUB_GATE,
-            //     neataptic.methods.mutation.ADD_SELF_CONN,
-            //     neataptic.methods.mutation.SUB_SELF_CONN,
-            //     neataptic.methods.mutation.ADD_BACK_CONN,
-            //     neataptic.methods.mutation.SUB_BACK_CONN
-            // ],
+            mutation: [
+                neataptic.methods.mutation.ADD_NODE,
+                neataptic.methods.mutation.SUB_NODE,
+                neataptic.methods.mutation.ADD_CONN,
+                neataptic.methods.mutation.SUB_CONN,
+                neataptic.methods.mutation.MOD_WEIGHT,
+                neataptic.methods.mutation.MOD_BIAS,
+                neataptic.methods.mutation.MOD_ACTIVATION,
+                neataptic.methods.mutation.ADD_GATE,
+                neataptic.methods.mutation.SUB_GATE,
+                neataptic.methods.mutation.ADD_SELF_CONN,
+                neataptic.methods.mutation.SUB_SELF_CONN,
+                neataptic.methods.mutation.ADD_BACK_CONN,
+                neataptic.methods.mutation.SUB_BACK_CONN
+            ],
             popsize: realPopSize,
             elitism: constants.ELITISM,
             mutationRate: constants.MUTATION_RATE,
             mutationAmount: constants.MUTATION_AMOUNT,
-            // network: new neataptic.architect.Random(
-            //     constants.SECTORS_OF_VISION + 4,
-            //     0,
-            //     2
-            // ),
         }
     );
 
