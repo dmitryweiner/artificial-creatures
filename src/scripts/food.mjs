@@ -15,8 +15,9 @@ export default class Food extends SimpleObject {
             return;
         }
 
-        const element = document.createElement('div');
-        element.setAttribute('id', this.id);
+        SimpleObject.prototype.createDOMElement.apply(this, arguments);
+
+        const element = document.getElementById(this.id);
         element.innerHTML = this.sign;
         element.setAttribute('class', 'food');
         element.style.left = this.x + 'px';

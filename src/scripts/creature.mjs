@@ -2,6 +2,7 @@ import * as constants from './const.mjs';
 import MovingObject from './moving-object.mjs';
 import Food from './food.mjs';
 import { getEmojiForCreature, sigmoidize, distance, angleToPoint } from './utils.mjs';
+import SimpleObject from './object.mjs';
 
 export default class Creature extends MovingObject {
 
@@ -28,8 +29,7 @@ export default class Creature extends MovingObject {
         const edgeDetectionResults = this.distanceToEdge();
         const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore), ...sigmoidize(edgeDetectionResults)]);
 
-        this.direction = activationResult[0] > 1 ? 1 : activationResult[0] < 0 ? 0 : activationResult[0];
-        this.direction = this.direction * 2 * Math.PI;
+        this.direction = activationResult[0]  * 2 * Math.PI;
         this.speed = activationResult[1] > 1 ? 1 : activationResult[1] < 0 ? 0 : activationResult[1];
 
         MovingObject.prototype.doTurn.apply(this, arguments); // call super
@@ -72,13 +72,13 @@ export default class Creature extends MovingObject {
             return;
         }
 
-        const element = document.createElement('div');
-        element.setAttribute('id', this.id);
+        SimpleObject.prototype.createDOMElement.apply(this, arguments);
+
+        const element = document.getElementById(this.id);
         element.innerHTML = this.sign;
         element.setAttribute('class', 'creature');
         element.style.left = this.x + 'px';
         element.style.top = this.y + 'px';
-        this.gameField.appendChild(element);
     }
 
     checkIntersect(foodStore) {
@@ -86,7 +86,7 @@ export default class Creature extends MovingObject {
             const food = foodStore[i];
             if (distance(food.x, food.y, this.x, this.y) < (Food.SIZE + this.size) / 2) {
                 foodStore[i].needDelete = true;
-                this.ttl += 10000; // TODO: const?
+                this.ttl += constants.FOOD_TTL_REWARD;
                 this.brain.score += constants.FOUND_FOOD_SCORE;
             }
         }
@@ -166,7 +166,7 @@ function convertTtlToSize(ttl) {
 
 function convertTtlToFontSize(ttl) {
     return 18;
-    
+
     const result = 18 * (ttl / constants.MAX_TTL);
     return result < 10 ? 10 : result;
 }

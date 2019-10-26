@@ -119,8 +119,10 @@ export function mutate(neat) {
     }
     for (let i = 0; i < neat.popsize - neat.elitism; i++) {
         const offspring = neat.getOffspring();
-        offspring.score = 0;
         newGeneration.push(offspring);
+    }
+    for (let i = 0; i < newGeneration.length; i++) {
+        newGeneration[i].score = 0;
     }
     neat.population = newGeneration;
     neat.mutate();

@@ -1,6 +1,6 @@
 import Creature from './creature.mjs';
 import Food from './food.mjs';
-import { createNeatapticObject } from './utils.mjs';
+import { createNeatapticObject, mutate } from './utils.mjs';
 
 export const STOP_STATE = 0;
 export const RUN_STATE = 1;
@@ -81,28 +81,7 @@ export default class Game {
     }
 
     mutate() {
-        this.neat.sort();
-
-        /*console.log({
-            generation: this.neat.generation,
-            max: this.neat.getFittest().score,
-            avg: Math.round(this.neat.getAverage()),
-            min: this.neat.population[this.neat.popsize - 1].score
-        });*/
-
-        const newGeneration = [];
-        for (let i = 0; i < this.neat.elitism; i++) {
-            newGeneration.push(this.neat.population[i]);
-        }
-        for (let i = 0; i < this.neat.popsize - this.neat.elitism; i++) {
-            const offspring = this.neat.getOffspring();
-            offspring.score = 0;
-            newGeneration.push(offspring);
-        }
-        this.neat.population = newGeneration;
-        this.neat.mutate();
-
-        this.neat.generation++;
+        this.neat = mutate(this.neat);
         this.removeAll();
         this.creatures = this.createCreatures(this.neat.population);
     }

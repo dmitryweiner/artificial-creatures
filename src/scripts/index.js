@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // if not all died do run
             if (trainingGames.some((game) => game.currentState === RUN_STATE)) {
                 trainingGames.map((game) => {
-                    if (game.foodStore.length === 0) {
+                    if (game.foodStore.length < 3) {
                         game.addFood();
                     }
                     game.run();
@@ -78,8 +78,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else { // Live mode
             if (liveGame.currentState === RUN_STATE) {
+                if (liveGame.foodStore.length < liveGame.creatures.length) {
+                    liveGame.addFood();
+                }
                 liveGame.run();
             } else {
+                updateGraph(
+                    liveGame.neat.population.map((brain) => brain.score),
+                    liveGame.neat.generation
+                );
                 liveGame.mutate(); // next generation
                 liveGame.start();
             }
@@ -92,11 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (currentMode === TRAINING_MODE) {
-            trainingGames.map((game) => {
-                if(game.currentState === RUN_STATE) {
-                    //game.addFood();
-                }
-            });
             displayStatistics(
                 trainingGames.map((game) => game.neat.population[0].score),
                 trainingGames.filter((game) => game.currentState === RUN_STATE).length,
@@ -104,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
             );
         } else { // Live mode
             if (liveGame.currentState === RUN_STATE) {
-                liveGame.addFood();
                 displayStatistics(
                     liveGame.neat.population.map((brain) => brain.score),
                     liveGame.creatures.length,
@@ -112,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
             }
         }
-    }, constants.FOOD_DELAY);
+    }, constants.STATISTICS_DELAY);
 
     liveGameField.addEventListener('click', (event) => {
         liveGame.addFood(event.clientX, event.clientY);
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             chartData = getInitialChartData();
+            chart.update(chartData);
 
             // init training games
             initTrainingGames();
@@ -147,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let population = trainingGames.map((game) => game.neat.population[0]);
 
             chartData = getInitialChartData();
+            chart.update(chartData);
 
             liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
             liveGame.start();
@@ -226,7 +229,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         for (let i = 0; i < neat.popsize; i++) {
-            console.log(neat.population[i]);
             neat.population[i].score = 0;
         }
 

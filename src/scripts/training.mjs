@@ -24,7 +24,7 @@ setInterval(() => {
     // if not all died do run
     if (trainingGames.some((game) => game.currentState === RUN_STATE)) {
         trainingGames.map((game) => {
-            if (game.foodStore.length === 0) {
+            if (game.foodStore.length < 3) {
                 game.addFood();
             }
             game.run();

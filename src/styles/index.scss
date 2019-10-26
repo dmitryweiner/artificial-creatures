@@ -74,10 +74,10 @@ html, body {
 
 .training-game-field {
     position: relative;
-    min-width: 200px;
-    max-width: 200px;
-    min-height: 200px;
-    max-height: 200px;
+    min-width: 400px;
+    max-width: 400px;
+    min-height: 400px;
+    max-height: 400px;
     margin-top: 20px;
     margin-left: 20px;
     background-color: darkgreen;
@@ -93,7 +93,7 @@ html, body {
 }
 
 #chart {
-    width: 230px;
+    width: 260px;
 }
 
 #toggleView {
