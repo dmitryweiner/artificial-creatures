@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else { // Live mode
             if (liveGame.currentState === RUN_STATE) {
-                if (liveGame.foodStore.length < liveGame.creatures.length) {
+                if (liveGame.foodStore.length < liveGame.creatures.length * constants.FOOD_RATE_COEFFICIENT) {
                     liveGame.addFood();
                 }
                 liveGame.run();
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         liveGame.addFood(event.clientX, event.clientY);
     });
 
-    document.getElementById('trainingSelector').addEventListener('change', (event) => {
+/*    document.getElementById('trainingSelector').addEventListener('change', (event) => {
         if(event.target.checked) {
             liveGameField.style.display = 'none';
             trainingGameFieldsHolder.style.display = 'flex';
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             initLiveGame(population);
         }
-    });
+    });*/
 
     document.getElementById('pauseCheckbox').addEventListener('change', (event) => {
         if(event.target.checked) {

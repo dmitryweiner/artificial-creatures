@@ -7,56 +7,32 @@ import { createNeatapticObject } from './utils.mjs';
 import population from './population.mjs';
 import neataptic from "neataptic";
 
-let trainingGames = [];
-let neat;
-
-neat = createNeatapticObject();
+let savedPopulation = null;
 
 if (typeof process.argv[2] !== 'undefined' && process.argv[2] === 'continue') {
     console.log('Loading trained population.');
-    neat.population = population.map((brain) => neataptic.Network.fromJSON(brain));
+    savedPopulation = population.map((brain) => neataptic.Network.fromJSON(brain));
 }
 
-for (let i = 0; i < neat.popsize; i++) {
-    neat.population[i].score = 0;
-}
-
-for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-    const trainingGameField = generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE);
-    const trainingGame = new Game(trainingGameField, 1, [neat.population[i]]);
-    trainingGame.start();
-    trainingGames.push(trainingGame);
-}
+const trainingGameField = generateFakeDOMElement('trainingGameField', constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE);
+let trainingGame = new Game(trainingGameField, constants.POPULATION_SIZE, savedPopulation);
+trainingGame.start();
 
 setInterval(() => {
     // if not all died do run
-    if (trainingGames.some((game) => game.currentState === RUN_STATE)) {
-        trainingGames.map((game) => {
-            if (game.foodStore.length < 3) {
-                game.addFood();
-            }
-            game.run();
-        });
+    if (trainingGame.currentState === RUN_STATE) {
+        if (trainingGame.foodStore.length < trainingGame.creatures.length * constants.FOOD_RATE_COEFFICIENT) {
+            trainingGame.addFood();
+        }
+        trainingGame.run();
     } else { // else mutate
         displayStatistics(
-            trainingGames.map((game) => game.neat.population[0].score),
-            neat.generation
+            trainingGame.neat.population.map((brain) => brain.score),
+            trainingGame.neat.generation
         );
-        neat.population = trainingGames.map((game) => game.neat.population[0]);
-        savePopulation(neat.population);
-        neat = mutate(neat);
-
-        trainingGames.map((game) => game.removeAll());
-        trainingGames = [];
-        for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-            const newGame = new Game(
-                generateFakeDOMElement('trainingGameField' + i, constants.TRAINING_CELL_SIZE, constants.TRAINING_CELL_SIZE),
-                1,
-                [neat.population[i]]
-            );
-            trainingGames[i] = newGame;
-            newGame.start();
-        }
+        savePopulation(trainingGame.neat.population);
+        trainingGame.mutate();
+        trainingGame.start();
     }
 }, 0);
 

@@ -134,7 +134,7 @@ export function mutate(neat) {
 export function createNeatapticObject(popSize = null) {
     const realPopSize = popSize ? popSize : constants.POPULATION_SIZE;
     return new neataptic.Neat(
-        constants.SECTORS_OF_VISION + 4, // inputs: sectors around + edge detection
+        constants.SECTORS_OF_VISION, // inputs: sectors around
         2, // output channels: angle and speed
         null, // ranking function
         {

@@ -95,6 +95,7 @@ export default class Game {
             this.handleCreatures();
             if (this.checkIfGameOver()) {
                 this.currentState = STOP_STATE;
+                this.removeAll();
             }
         }
     }

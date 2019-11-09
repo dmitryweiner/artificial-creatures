@@ -26,8 +26,7 @@ export default class Creature extends MovingObject {
 
         //steps
         let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, constants.MAX_SEEKING_DISTANCE);
-        const edgeDetectionResults = this.distanceToEdge();
-        const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore), ...sigmoidize(edgeDetectionResults)]);
+        const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore)]);
 
         this.direction = activationResult[0]  * 2 * Math.PI;
         this.speed = activationResult[1] > 1 ? 1 : activationResult[1] < 0 ? 0 : activationResult[1];
@@ -48,13 +47,6 @@ export default class Creature extends MovingObject {
             } else if (minDistanceAfter > minDistanceBefore) {
                 this.brain.score -= reward;
             }
-        }
-
-        // punish close to edge moving
-        const edgeKillingResults = this.edgeDetection();
-        if (edgeKillingResults.some((e) => e === 1)) {
-            this.needDelete = true;
-            this.brain.score -= constants.CLOSE_TO_EDGE_SCORE;
         }
 
         if (this.ttl < 0) {
