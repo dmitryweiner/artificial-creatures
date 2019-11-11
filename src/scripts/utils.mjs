@@ -113,14 +113,31 @@ export function distance(x1, y1, x2, y2) {
 export function mutate(neat) {
     neat.sort();
 
-    const newGeneration = [];
+    let newGeneration = [];
+    const max = neat.population[0].score;
+    const sum = neat.population.map((brain) => brain.score).reduce((sum, x) => sum + x);
+    const avg = sum / neat.population.length;
+
+
+    // genotypes with highest scores will reproduce
+    console.log(neat.population.map((brain) => brain.score));
     for (let i = 0; i < neat.elitism; i++) {
-        newGeneration.push(neat.population[i]);
+        const offsprings = neat.population[i].score > (max - (max - avg) / constants.OVERHEAD)
+            ? constants.SCORE_REPRODUCTION_COEFFICIENT
+            : 1;
+        for (let j = 0; j < offsprings; j++) {
+            newGeneration.push(neataptic.Network.fromJSON(neat.population[i].toJSON()));
+        }
     }
-    for (let i = 0; i < neat.popsize - neat.elitism; i++) {
+    //newGeneration = newGeneration.splice(0, neat.elitism);
+    newGeneration = newGeneration.splice(0, neat.population.length);
+
+    while(newGeneration.length < neat.population.length) {
         const offspring = neat.getOffspring();
         newGeneration.push(offspring);
     }
+
+    // resetting scores
     for (let i = 0; i < newGeneration.length; i++) {
         newGeneration[i].score = 0;
     }

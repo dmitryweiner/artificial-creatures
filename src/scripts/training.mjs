@@ -8,6 +8,7 @@ import population from './population.mjs';
 import neataptic from "neataptic";
 
 let savedPopulation = null;
+let lastCycleTime = new Date();
 
 if (typeof process.argv[2] !== 'undefined' && process.argv[2] === 'continue') {
     console.log('Loading trained population.');
@@ -28,15 +29,17 @@ setInterval(() => {
     } else { // else mutate
         displayStatistics(
             trainingGame.neat.population.map((brain) => brain.score),
-            trainingGame.neat.generation
+            trainingGame.neat.generation,
+            new Date() - lastCycleTime
         );
         savePopulation(trainingGame.neat.population);
         trainingGame.mutate();
         trainingGame.start();
+        lastCycleTime = new Date();
     }
 }, 0);
 
-function displayStatistics(scores, generation) {
+function displayStatistics(scores, generation, time) {
     const sum = scores.reduce((sum, x) => sum + x);
     const max = Math.max(...scores);
     const min = Math.min(...scores);
@@ -46,7 +49,8 @@ function displayStatistics(scores, generation) {
         generation,
         min: min.toFixed(2),
         avg: avg.toFixed(2),
-        max: max.toFixed(2)
+        max: max.toFixed(2),
+        time,
     });
 }
 
