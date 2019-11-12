@@ -1,6 +1,6 @@
 import Creature from './creature.mjs';
 import Food from './food.mjs';
-import { createNeatapticObject, mutate } from './utils.mjs';
+import { mutate, createNeatapticObject } from './neataptic-utils.mjs';
 
 export const STOP_STATE = 0;
 export const RUN_STATE = 1;

@@ -2,10 +2,9 @@ import '../styles/index.scss';
 import * as constants from './const.mjs';
 import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
-import { mutate } from './utils.mjs';
 import population from './population.mjs';
 import neataptic from 'neataptic';
-import { createNeatapticObject } from './utils.mjs';
+import { mutate, createNeatapticObject } from './neataptic-utils.mjs';
 
 const TRAINING_MODE = 'training';
 const LIVE_MODE = 'live';

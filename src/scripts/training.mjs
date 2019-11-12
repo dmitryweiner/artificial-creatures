@@ -2,10 +2,8 @@ import fs from 'fs';
 import * as constants from './const.mjs';
 import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
-import { mutate } from './utils.mjs';
-import { createNeatapticObject } from './utils.mjs';
 import population from './population.mjs';
-import neataptic from "neataptic";
+import neataptic from 'neataptic';
 
 let savedPopulation = null;
 let lastCycleTime = new Date();
