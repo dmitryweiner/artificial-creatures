@@ -46,7 +46,7 @@ export function mutate(neat) {
 
 /**
  *
- * @param {number} popSize
+ * @param {number | null} popSize
  * @returns {Neat}
  */
 export function createNeatapticObject(popSize = null) {
