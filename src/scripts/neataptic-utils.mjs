@@ -1,6 +1,11 @@
 import * as constants from './const.mjs';
 import neataptic from 'neataptic';
 
+/**
+ *
+ * @param {Neat} neat
+ * @returns {Neat}
+ */
 export function mutate(neat) {
     neat.sort();
 
@@ -39,6 +44,11 @@ export function mutate(neat) {
     return neat;
 }
 
+/**
+ *
+ * @param {number} popSize
+ * @returns {Neat}
+ */
 export function createNeatapticObject(popSize = null) {
     const realPopSize = popSize ? popSize : constants.POPULATION_SIZE;
     return new neataptic.Neat(
@@ -69,6 +79,11 @@ export function createNeatapticObject(popSize = null) {
     );
 }
 
+/**
+ *
+ * @param {neataptic.Node} node
+ * @returns {neataptic.Node}
+ */
 export function cloneNode(node) {
     return neataptic.Network.fromJSON(node.toJSON());
 }

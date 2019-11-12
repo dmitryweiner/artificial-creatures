@@ -4,41 +4,17 @@ import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
 import population from './population.mjs';
 import neataptic from 'neataptic';
-import { mutate, createNeatapticObject } from './neataptic-utils.mjs';
-
-const TRAINING_MODE = 'training';
-const LIVE_MODE = 'live';
 
 document.addEventListener('DOMContentLoaded', function () {
-    let currentMode = LIVE_MODE;
     let isPaused = false;
     let isFullPanelMode = true;
     const liveGameField = document.getElementById(constants.GAME_FIELD_ID);
-    const trainingGameFieldsHolder = document.getElementById('trainingGameFieldsHolder');
-    let liveGame;
-    let trainingGames = [];
-    let neat;
-
-    for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-        const trainingGameField = document.createElement('div');
-        trainingGameField.setAttribute('id', 'trainingGameField' + i);
-        trainingGameField.setAttribute('class', 'training-game-field');
-        const statistics = document.createElement('div');
-        statistics.setAttribute('id', 'statistics' + i);
-        statistics.setAttribute('class', 'field-statistics');
-        trainingGameField.appendChild(statistics);
-        trainingGameFieldsHolder.appendChild(trainingGameField);
-    }
-
-    if (currentMode === TRAINING_MODE) {
-        liveGameField.style.display = 'none';
-        trainingGameFieldsHolder.style.display = 'flex';
-        initTrainingGames(population.map((brain) => neataptic.Network.fromJSON(brain)));
-    } else {
-        liveGameField.style.display = 'block';
-        trainingGameFieldsHolder.style.display = 'none';
-        initLiveGame(population.map((brain) => neataptic.Network.fromJSON(brain)));
-    }
+    let liveGame = new Game(
+        liveGameField,
+        constants.POPULATION_SIZE,
+        population.map((brain) => neataptic.Network.fromJSON(brain))
+    );
+    liveGame.start();
 
     let chartData = getInitialChartData();
     const chart = new Chart('#chart', {
@@ -52,51 +28,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (currentMode === TRAINING_MODE) {
-            // if not all died do run
-            if (trainingGames.some((game) => game.currentState === RUN_STATE)) {
-                trainingGames.map((game) => {
-                    if (game.foodStore.length < 3) {
-                        game.addFood();
-                    }
-                    game.run();
-                });
-            } else { // else mutate
-                updateGraph(
-                    trainingGames.map((game) => game.neat.population[0].score),
-                    neat.generation
-                );
-
-                // gather population from training games
-                neat.population = trainingGames.map((game) => game.neat.population[0]);
-                neat = mutate(neat);
-
-                trainingGames.map((game) => game.removeAll());
-                trainingGames = [];
-                for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-                    const newGame = new Game(
-                        document.getElementById('trainingGameField' + i),
-                        1,
-                        [neat.population[i]]
-                    );
-                    trainingGames[i] = newGame;
-                    newGame.start();
-                }
+        if (liveGame.currentState === RUN_STATE) {
+            if (liveGame.foodStore.length < liveGame.creatures.length * constants.FOOD_RATE_COEFFICIENT) {
+                liveGame.addFood();
             }
-        } else { // Live mode
-            if (liveGame.currentState === RUN_STATE) {
-                if (liveGame.foodStore.length < liveGame.creatures.length * constants.FOOD_RATE_COEFFICIENT) {
-                    liveGame.addFood();
-                }
-                liveGame.run();
-            } else {
-                updateGraph(
-                    liveGame.neat.population.map((brain) => brain.score),
-                    liveGame.neat.generation
-                );
-                liveGame.mutate(); // next generation
-                liveGame.start();
-            }
+            liveGame.run();
+        } else {
+            updateGraph(
+                liveGame.neat.population.map((brain) => brain.score),
+                liveGame.neat.generation
+            );
+            liveGame.mutate(); // next generation
+            liveGame.start();
         }
     }, constants.DELAY);
 
@@ -105,62 +48,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (currentMode === TRAINING_MODE) {
+        if (liveGame.currentState === RUN_STATE) {
             displayStatistics(
-                trainingGames.map((game) => game.neat.population[0].score),
-                trainingGames.filter((game) => game.currentState === RUN_STATE).length,
-                neat.generation
+                liveGame.neat.population.map((brain) => brain.score),
+                liveGame.creatures.length,
+                liveGame.neat.generation
             );
-        } else { // Live mode
-            if (liveGame.currentState === RUN_STATE) {
-                displayStatistics(
-                    liveGame.neat.population.map((brain) => brain.score),
-                    liveGame.creatures.length,
-                    liveGame.neat.generation
-                );
-            }
         }
     }, constants.STATISTICS_DELAY);
 
     liveGameField.addEventListener('click', (event) => {
         liveGame.addFood(event.clientX, event.clientY);
     });
-
-/*    document.getElementById('trainingSelector').addEventListener('change', (event) => {
-        if(event.target.checked) {
-            liveGameField.style.display = 'none';
-            trainingGameFieldsHolder.style.display = 'flex';
-            currentMode = TRAINING_MODE;
-
-            if (liveGame) {
-                liveGame.stop();
-            }
-
-            chartData = getInitialChartData();
-            chart.update(chartData);
-
-            // init training games
-            initTrainingGames(liveGame.neat.population);
-        }
-    });
-
-    document.getElementById('liveSelector').addEventListener('change', (event) => {
-        if(event.target.checked) {
-            liveGameField.style.display = 'block';
-            trainingGameFieldsHolder.style.display = 'none';
-
-            trainingGames.forEach((game) => game.stop());
-            currentMode = LIVE_MODE;
-
-            // gather population from training games
-            let population = trainingGames.map((game) => game.neat.population[0]);
-
-            chartData = getInitialChartData();
-            chart.update(chartData);
-
-            initLiveGame(population);
-        }
-    });*/
 
     document.getElementById('pauseCheckbox').addEventListener('change', (event) => {
         if(event.target.checked) {
@@ -189,7 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /**
      *
-     * @param {number[]} scores
+     * @param {Number[]} scores
+     * @param {Number} aliveCount
+     * @param {Number} generation
      */
     function displayStatistics(scores, aliveCount, generation) {
         const sum = scores.reduce((sum, x) => sum + x);
@@ -202,10 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.avg').forEach((element) => element.innerHTML = '' + avg.toFixed(2));
         document.querySelectorAll('.alive').forEach((element) => element.innerHTML = '' + aliveCount);
         document.querySelectorAll('.generation').forEach((element) => element.innerHTML = '' + generation);
-
-        for (let i = 0; i < scores.length; i++) {
-            document.getElementById('statistics' + i).innerHTML = '' + scores[i].toFixed(2);
-        }
     }
 
     function updateGraph(scores, generation) {
@@ -224,33 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
             chartData.datasets.forEach(d => d.values.shift());
         }
         chart.update(chartData);
-    }
-
-    function initTrainingGames(population = null) {
-
-        neat = createNeatapticObject();
-
-        if (population) {
-            neat.population = population;
-        }
-
-        for (let i = 0; i < neat.popsize; i++) {
-            neat.population[i].score = 0;
-        }
-
-        trainingGames = [];
-
-        for (let i = 0; i < constants.POPULATION_SIZE; i++) {
-            const trainingGameField = document.getElementById('trainingGameField' + i);
-            const trainingGame = new Game(trainingGameField, 1, [neat.population[i]]);
-            trainingGame.start();
-            trainingGames.push(trainingGame);
-        }
-    }
-
-    function initLiveGame(population) {
-        liveGame = new Game(liveGameField, constants.POPULATION_SIZE, population);
-        liveGame.start();
     }
 
     function getInitialChartData() {

@@ -60,36 +60,6 @@ html, body {
     display: none;
 }
 
-#trainingGameFieldsHolder {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    background-color: sandybrown;
-    overflow-y: scroll;
-    padding-bottom: 20px;
-    padding-right: 20px;
-}
-
-.training-game-field {
-    position: relative;
-    min-width: 400px;
-    max-width: 400px;
-    min-height: 400px;
-    max-height: 400px;
-    margin-top: 20px;
-    margin-left: 20px;
-    background-color: darkgreen;
-}
-
-.field-statistics {
-    position: absolute;
-    color: lightyellow;
-    font-size: 12px;
-    top: 5px;
-    left: 5px;
-    font-family: Arial;
-}
-
 #chart {
     width: 260px;
 }
