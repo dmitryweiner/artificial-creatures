@@ -4,9 +4,9 @@ import Game from './game.mjs';
 import { RUN_STATE } from './game.mjs';
 import population from './population.mjs';
 import neataptic from 'neataptic';
+import { gameTick } from './utils';
 
 document.addEventListener('DOMContentLoaded', function () {
-    let isPaused = false;
     let isFullPanelMode = true;
     const liveGameField = document.getElementById(constants.GAME_FIELD_ID);
     let liveGame = new Game(
@@ -23,11 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: chartData
     });
 
-    window.setInterval(() => {
-        if (isPaused) {
-            return;
-        }
-
+    gameTick(() => {
         if (liveGame.currentState === RUN_STATE) {
             if (liveGame.foodStore.length < liveGame.creatures.length * constants.FOOD_RATE_COEFFICIENT) {
                 liveGame.addFood();
@@ -41,13 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
             liveGame.mutate(); // next generation
             liveGame.start();
         }
-    }, constants.DELAY);
+    }, constants.FPS);
 
     window.setInterval(() => {
-        if (isPaused) {
-            return;
-        }
-
         if (liveGame.currentState === RUN_STATE) {
             displayStatistics(
                 liveGame.neat.population.map((brain) => brain.score),
@@ -59,14 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     liveGameField.addEventListener('click', (event) => {
         liveGame.addFood(event.clientX, event.clientY);
-    });
-
-    document.getElementById('pauseCheckbox').addEventListener('change', (event) => {
-        if(event.target.checked) {
-            isPaused = true;
-        } else {
-            isPaused = false;
-        }
     });
 
     const toggleView = document.getElementById('toggleView');

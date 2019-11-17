@@ -106,3 +106,17 @@ export function distance(x1, y1, x2, y2) {
 
     return Math.sqrt(dx * dx + dy * dy);
 }
+
+export function gameTick(callback, fps) {
+    const timeBegin = new Date();
+    callback();
+    const actualDelay = new Date() - timeBegin;
+    const plannedDelay = 1000 / fps;
+
+    if (actualDelay < plannedDelay) {
+        setTimeout(() => requestAnimationFrame(() => gameTick(callback, fps)), plannedDelay - actualDelay);
+    } else {
+        requestAnimationFrame(() => gameTick(callback, fps));
+    }
+}
+

@@ -1,5 +1,6 @@
 export const GAME_FIELD_ID = 'gameField';
 export const DELAY = 10;
+export const FPS = 1000 / DELAY;
 export const STATISTICS_DELAY = 250;
 export const MAX_TTL = 6000;
 export const FOOD_TTL_REWARD = MAX_TTL * 1.5;
