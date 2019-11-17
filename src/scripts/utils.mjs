@@ -107,6 +107,11 @@ export function distance(x1, y1, x2, y2) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+/**
+ *
+ * @param {function} callback
+ * @param {number} fps
+ */
 export function gameTick(callback, fps) {
     const timeBegin = new Date();
     callback();

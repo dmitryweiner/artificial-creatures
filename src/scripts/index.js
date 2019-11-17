@@ -7,12 +7,20 @@ import neataptic from 'neataptic';
 import { gameTick } from './utils';
 
 document.addEventListener('DOMContentLoaded', function () {
-    let isFullPanelMode = true;
+
+    let isFullPanelMode = document.body.clientWidth > 800;
+    renderPanel();
+
     const liveGameField = document.getElementById(constants.GAME_FIELD_ID);
+    const popSize = document.body.clientWidth > 2000
+        ? constants.POPULATION_SIZE
+        : Math.ceil(constants.POPULATION_SIZE * (document.body.clientWidth / 2000));
+    const truncatedPopulation = population.splice(0, popSize);
+    console.log(popSize, truncatedPopulation);
     let liveGame = new Game(
         liveGameField,
-        constants.POPULATION_SIZE,
-        population.map((brain) => neataptic.Network.fromJSON(brain))
+        popSize,
+        truncatedPopulation.map((brain) => neataptic.Network.fromJSON(brain))
     );
     liveGame.start();
 
@@ -53,22 +61,27 @@ document.addEventListener('DOMContentLoaded', function () {
         liveGame.addFood(event.clientX, event.clientY);
     });
 
-    const toggleView = document.getElementById('toggleView');
-    toggleView.addEventListener('click', (event) => {
+    document.getElementById('toggleView').addEventListener('click', (event) => {
+        isFullPanelMode = !isFullPanelMode;
+        renderPanel();
+        event.preventDefault();
+        return false;
+    });
+
+    function renderPanel() {
+        const toggleView = document.getElementById('toggleView');
         const shortPanel = document.getElementById('shortPanel');
         const fullPanel = document.getElementById('fullPanel');
-
-        isFullPanelMode = !isFullPanelMode;
         if (isFullPanelMode) {
-            toggleView.value = '[-]';
+            toggleView.innerText = '[-]';
             fullPanel.style.display = 'block';
             shortPanel.style.display = 'none';
         } else {
-            toggleView.value = '[+]';
+            toggleView.innerText = '[+]';
             fullPanel.style.display = 'none';
             shortPanel.style.display = 'block';
         }
-    });
+    }
 
     /**
      *

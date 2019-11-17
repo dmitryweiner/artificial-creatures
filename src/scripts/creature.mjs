@@ -15,6 +15,7 @@ export default class Creature extends MovingObject {
         this.sign = getEmojiForCreature();
         this.needDelete = false;
         this.step = 1;
+        this.directionShift = Math.random() * 2 * Math.PI;
         this.brain = brain;
     }
 
@@ -28,7 +29,7 @@ export default class Creature extends MovingObject {
         let distanceToFoodBefore = getVisibleFood(this.x, this.y, food, constants.MAX_SEEKING_DISTANCE);
         const activationResult = this.brain.activate([...sigmoidize(distanceToFoodBefore)]);
 
-        this.direction = activationResult[0]  * 2 * Math.PI;
+        this.direction = activationResult[0]  * 2 * Math.PI + this.directionShift;
         this.speed = activationResult[1] > 1 ? 1 : activationResult[1] < 0 ? 0 : activationResult[1];
 
         MovingObject.prototype.doTurn.apply(this, arguments); // call super

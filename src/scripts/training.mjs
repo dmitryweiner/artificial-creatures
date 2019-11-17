@@ -62,6 +62,7 @@ function generateFakeDOMElement(id, clientWidth, clientHeight) {
 }
 
 function savePopulation(population) {
+    population.sort((a,b) => (a.score < b.score) ? 1 : ((b.score < a.score) ? -1 : 0)); // reverse sorting by score (best first)
     const json = 'export default ' + JSON.stringify(population) + ';';
     fs.writeFile('src/scripts/population.mjs', json, 'utf8', (err, data) => {
         if (err) {
